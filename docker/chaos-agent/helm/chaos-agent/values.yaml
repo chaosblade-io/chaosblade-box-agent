@@ -1,0 +1,32 @@
+# Default values for chaos.
+controller:
+  transport_endpoint: ""
+
+images:
+  # chaos agent image named chaos-agent
+  chaosagnet:
+    repository: chaos-agent
+    version: latest
+    # images.chaos.pullPolicy: must be Always|IfNotPresent|Never
+    pullPolicy: IfNotPresent
+
+env:
+  # env.name: the cluster environment that is running
+  name: default
+  mode: k8s_helm
+  debug: ""
+
+log:
+  output: file
+
+resources:
+  requests:
+    # resources.requests.cpu: cpu request
+    cpu: 0.05
+    # resources.requests.memory: memory request
+    memory: 200Mi
+  limits:
+    # resources.limits.cpu: cpu limit
+    cpu: 0.2
+    # resources.limits.memory: memory limit
+    memory: 300Mi
