@@ -13,7 +13,7 @@ clean:
 
 build:
 	rm -rf $(BUILD_TARGET_PKG_DIR)
-	$(GO) build -o $(BUILD_TARGET_PKG_DIR)/agent ./
+	go build -o $(BUILD_TARGET_PKG_DIR)/agent ./
 
 build_linux_amd64:
 	rm -rf $(BUILD_TARGET_PKG_DIR)
