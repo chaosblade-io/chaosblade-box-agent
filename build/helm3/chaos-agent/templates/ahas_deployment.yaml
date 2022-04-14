@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chaos-agent
+  labels:
+    name: chaos-agent
+    app: chaos-agent
+spec:
+  selector:
+    matchLabels:
+      name: chaos-agent
+  template:
+    metadata:
+      labels:
+        name: chaos-agent
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: type
+                    operator: NotIn
+                    values:
+                      - virtual-kubelet
+      containers:
+        - name: chaos-agent
+          image: {{ .Values.images.chaos.repository }}:{{ .Values.images.chaos.version }}
+          imagePullPolicy: {{ .Values.images.chaos.pullPolicy }}
+          env:
+            - name: KUBERNETES_NODENAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: DOCKER_API_VERSION
+              value: "1.14.0"
+          args:
+            {{- if .Values.license }}
+            - '--license={{ .Values.license }}'
+            {{- end }}
+            {{- if .Values.env.mode }}
+            - '--agent.mode={{ .Values.env.mode }}'
+            {{- end }}
+            {{- if .Values.env.name }}
+            - '--namespace={{ .Values.env.name }}'
+            {{- end }}
+            {{- if .Values.env.debug }}
+            - '--debug'
+            {{- end }}
+            {{- if .Values.controller.cluster_id }}
+            - '--kubernetes.cluster.id={{ .Values.controller.cluster_id }}'
+            {{- end }}
+            {{- if .Values.controller.cluster_name }}
+            - '--kubernetes.cluster.name={{ .Values.controller.cluster_name }}'
+            {{- end }}
+            {{- if .Values.controller.cluster_type }}
+            - '--kubernetes.cluster.type={{ .Values.controller.cluster_type }}'
+            {{- end }}
+            {{- if .Values.transport.endpoint }}
+            - '--transport.endpoint={{ .Values.transport.endpoint }}'
+            {{ end }}
+            - '--kubernetes.pod.report=true'
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 0.05
+              memory: 200Mi
+            limits:
+              cpu: 0.2
+              memory: 300Mi
+          volumeMounts:
+            - mountPath: /var/run/docker.sock
+              name: docker-socket
+            - mountPath: /etc/hosts
+              name: hosts
+            - mountPath: /run/containerd
+              name: containerd
+            - mountPath: /var/lib/containerd
+              name: containerd-lib
+            - mountPath: /etc/containerd
+              name: containerd-etc
+
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      hostPID: true
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+      volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: docker-socket
+        - hostPath:
+            path: /etc/hosts
+          name: hosts
+        - hostPath:
+            path: /run/containerd
+          name: containerd
+        - hostPath:
+            path: /var/lib/containerd
+          name: containerd-lib
+        - hostPath:
+            path: /etc/containerd
+          name: containerd-etc
+      serviceAccountName: chaos-agent
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: chaos-agent
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: {{ .Values.transport.port }}
+      targetPort: {{ .Values.transport.port }}
+  selector:
+    name: chaos-agent

@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="a6002dcc-d6bf-42ab-8ef9-2da15f8f51ff" name="Default Changelist" comment="update agent external ip to server">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/chaos_agent.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/chaos_agent.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/collector/kubernetes/kubernetes.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/kubernetes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/collector/kubernetes/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/node.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/kubernetes/kubernetes.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/kubernetes/kubernetes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/options/bladeoptions.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/options/bladeoptions.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/options/options.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/options/options.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/transport/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/request.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/handler/chaosblade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/chaosblade.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" path="/usr/local/go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="false" />
+  </component>
+  <component name="ProjectId" id="1xa8XXyjann3oYUXWTfVNMgdppu" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="GO_FMT" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.import.settings.migrated" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="go.sdk" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/build/helm3/chaos-agent/templates" />
+      <recent name="$PROJECT_DIR$/build/cmd" />
+      <recent name="$PROJECT_DIR$/build/helm3" />
+      <recent name="$PROJECT_DIR$/build" />
+      <recent name="$PROJECT_DIR$/collector/kubernetes" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/build" />
+      <recent name="$PROJECT_DIR$/collector/kubernetes" />
+      <recent name="$PROJECT_DIR$/pkg/tools" />
+      <recent name="$PROJECT_DIR$/web/server" />
+      <recent name="$PROJECT_DIR$/web/handler/upgrade" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go Build.go build github.com/chaosblade-io/chaos-agent/cmd">
+    <configuration name="go build github.com/chaosblade-io/chaos-agent/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="chaos-agent-community" />
+      <working_directory value="$PROJECT_DIR$" />
+      <parameters value="--transport.endpoint 127.0.0.1:7001 --license 60e70be6f0fd40ba821d663255f160f3 " />
+      <kind value="PACKAGE" />
+      <filePath value="$PROJECT_DIR$/cmd/chaos_agent.go" />
+      <package value="github.com/chaosblade-io/chaos-agent/cmd" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/chaosblade-io/chaosblade-box-agent/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="chaos-agent-community" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <filePath value="$PROJECT_DIR$/cmd/ahas-agent.go" />
+      <package value="github.com/chaosblade-io/chaosblade-box-agent/cmd" />
+      <directory value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="build_binary" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
+      <makefile filename="$PROJECT_DIR$/Makefile" target="build_binary" workingDirectory="" arguments="">
+        <envs />
+      </makefile>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Build.go build github.com/chaosblade-io/chaos-agent/cmd" />
+        <item itemvalue="Makefile.build_binary" />
+        <item itemvalue="Go Build.go build github.com/chaosblade-io/chaosblade-box-agent/cmd" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a6002dcc-d6bf-42ab-8ef9-2da15f8f51ff" name="Default Changelist" comment="" />
+      <created>1630581878963</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1630581878963</updated>
+    </task>
+    <task id="LOCAL-00001" summary="change transport for community, from gateway to direct-http">
+      <created>1631797723754</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1631797723754</updated>
+    </task>
+    <task id="LOCAL-00002" summary="init community chaos-agent">
+      <created>1636362712908</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1636362712908</updated>
+    </task>
+    <task id="LOCAL-00003" summary="init community chaos-agent">
+      <created>1636362763970</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1636362763970</updated>
+    </task>
+    <task id="LOCAL-00004" summary="init community chaos-agent">
+      <created>1636539318783</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1636539318783</updated>
+    </task>
+    <task id="LOCAL-00005" summary="init community chaos-agent">
+      <created>1636595012190</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1636595012190</updated>
+    </task>
+    <task id="LOCAL-00006" summary="init community chaos-agent">
+      <created>1637719669828</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1637719669828</updated>
+    </task>
+    <task id="LOCAL-00007" summary="init community chaos-agent">
+      <created>1637944539342</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1637944539342</updated>
+    </task>
+    <task id="LOCAL-00008" summary="edit for connect to server">
+      <created>1640001613995</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1640001613996</updated>
+    </task>
+    <task id="LOCAL-00009" summary="build binary and image">
+      <created>1641872503968</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1641872503968</updated>
+    </task>
+    <task id="LOCAL-00010" summary="add helm chart">
+      <created>1641883647016</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1641883647016</updated>
+    </task>
+    <task id="LOCAL-00011" summary="finish start shell">
+      <created>1645671420829</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1645671420829</updated>
+    </task>
+    <task id="LOCAL-00012" summary="finish start shell">
+      <created>1647416805330</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1647416805330</updated>
+    </task>
+    <task id="LOCAL-00013" summary="add uninstall api">
+      <created>1648433218503</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1648433218504</updated>
+    </task>
+    <task id="LOCAL-00014" summary="delete ahas\aliyun">
+      <created>1648434889535</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1648434889535</updated>
+    </task>
+    <task id="LOCAL-00015" summary="delete inner code">
+      <created>1648799523874</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1648799523874</updated>
+    </task>
+    <task id="LOCAL-00016" summary="update agent external ip to server">
+      <created>1649917557920</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1649917557921</updated>
+    </task>
+    <task id="LOCAL-00017" summary="update agent external ip to server">
+      <created>1649919841050</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1649919841050</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="change transport for community, from gateway to direct-http" />
+    <MESSAGE value="init community chaos-agent" />
+    <MESSAGE value="edit for connect to server" />
+    <MESSAGE value="build binary and image" />
+    <MESSAGE value="add helm chart" />
+    <MESSAGE value="finish start shell" />
+    <MESSAGE value="add uninstall api" />
+    <MESSAGE value="delete ahas\aliyun" />
+    <MESSAGE value="delete inner code" />
+    <MESSAGE value="update agent external ip to server" />
+    <option name="LAST_COMMIT_MESSAGE" value="update agent external ip to server" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="639" y="378" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1648624720922">
+      <screen x="60" y="25" width="1732" height="1095" />
+    </state>
+    <state x="639" y="378" key="#com.intellij.fileTypes.FileTypeChooser/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648624720922" />
+    <state x="549" y="180" key="CommitChangelistDialog2" timestamp="1649920551145">
+      <screen x="58" y="25" width="1734" height="1095" />
+    </state>
+    <state x="514" y="163" key="CommitChangelistDialog2/-49.-1415.2560.1415/58.25.1734.1095@58.25.1734.1095" timestamp="1648630171489" />
+    <state x="515" y="163" key="CommitChangelistDialog2/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648624868992" />
+    <state x="624" y="-1237" key="CommitChangelistDialog2/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1647416805072" />
+    <state x="624" y="-1237" key="CommitChangelistDialog2/-49.-1415.2560.1415/71.25.1721.1095@-49.-1415.2560.1415" timestamp="1645671420354" />
+    <state x="524" y="163" key="CommitChangelistDialog2/-49.-1415.2560.1415/71.25.1721.1095@71.25.1721.1095" timestamp="1645621558605" />
+    <state x="525" y="163" key="CommitChangelistDialog2/-49.-1415.2560.1415/73.25.1719.1095@73.25.1719.1095" timestamp="1648799523506" />
+    <state x="625" y="-1237" key="CommitChangelistDialog2/-49.-1415.2560.1415/74.25.1718.1095@-49.-1415.2560.1415" timestamp="1641883646836" />
+    <state x="526" y="163" key="CommitChangelistDialog2/-49.-1415.2560.1415/74.25.1718.1095@74.25.1718.1095" timestamp="1641872503742" />
+    <state x="547" y="180" key="CommitChangelistDialog2/55.25.1737.1095@55.25.1737.1095" timestamp="1649919840849" />
+    <state x="549" y="180" key="CommitChangelistDialog2/58.25.1734.1095@58.25.1734.1095" timestamp="1649920551145" />
+    <state x="233" y="120" key="DiffContextDialog" timestamp="1649917569086">
+      <screen x="58" y="25" width="1734" height="1095" />
+    </state>
+    <state x="233" y="120" key="DiffContextDialog/58.25.1734.1095@58.25.1734.1095" timestamp="1649917569086" />
+    <state width="1690" height="418" key="GridCell.Tab.0.bottom" timestamp="1648797428685">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.0.bottom/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304739" />
+    <state width="1676" height="418" key="GridCell.Tab.0.bottom/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214644" />
+    <state width="1676" height="300" key="GridCell.Tab.0.bottom/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645433193799" />
+    <state width="1690" height="418" key="GridCell.Tab.0.bottom/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428685" />
+    <state width="1676" height="300" key="GridCell.Tab.0.bottom/-49.-1415.2560.1415/74.25.1718.1095@-49.-1415.2560.1415" timestamp="1641903385622" />
+    <state width="1690" height="418" key="GridCell.Tab.0.center" timestamp="1648797428483">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.0.center/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304738" />
+    <state width="1676" height="418" key="GridCell.Tab.0.center/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214644" />
+    <state width="1676" height="300" key="GridCell.Tab.0.center/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645433193798" />
+    <state width="1690" height="418" key="GridCell.Tab.0.center/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428483" />
+    <state width="1676" height="300" key="GridCell.Tab.0.center/-49.-1415.2560.1415/74.25.1718.1095@-49.-1415.2560.1415" timestamp="1641903385622" />
+    <state width="1690" height="418" key="GridCell.Tab.0.left" timestamp="1648797428456">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.0.left/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304738" />
+    <state width="1676" height="418" key="GridCell.Tab.0.left/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214643" />
+    <state width="1676" height="300" key="GridCell.Tab.0.left/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645433193797" />
+    <state width="1690" height="418" key="GridCell.Tab.0.left/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428456" />
+    <state width="1676" height="300" key="GridCell.Tab.0.left/-49.-1415.2560.1415/74.25.1718.1095@-49.-1415.2560.1415" timestamp="1641903385621" />
+    <state width="1690" height="418" key="GridCell.Tab.0.right" timestamp="1648797428681">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.0.right/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304739" />
+    <state width="1676" height="418" key="GridCell.Tab.0.right/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214644" />
+    <state width="1676" height="300" key="GridCell.Tab.0.right/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645433193798" />
+    <state width="1690" height="418" key="GridCell.Tab.0.right/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428681" />
+    <state width="1676" height="300" key="GridCell.Tab.0.right/-49.-1415.2560.1415/74.25.1718.1095@-49.-1415.2560.1415" timestamp="1641903385622" />
+    <state width="1690" height="418" key="GridCell.Tab.1.bottom" timestamp="1648797428687">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.1.bottom/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304741" />
+    <state width="1676" height="418" key="GridCell.Tab.1.bottom/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214646" />
+    <state width="1676" height="418" key="GridCell.Tab.1.bottom/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645430308925" />
+    <state width="1690" height="418" key="GridCell.Tab.1.bottom/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428687" />
+    <state width="1690" height="418" key="GridCell.Tab.1.center" timestamp="1648797428686">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.1.center/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304740" />
+    <state width="1676" height="418" key="GridCell.Tab.1.center/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214645" />
+    <state width="1676" height="418" key="GridCell.Tab.1.center/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645430308924" />
+    <state width="1690" height="418" key="GridCell.Tab.1.center/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428686" />
+    <state width="1690" height="418" key="GridCell.Tab.1.left" timestamp="1648797428685">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.1.left/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304740" />
+    <state width="1676" height="418" key="GridCell.Tab.1.left/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214645" />
+    <state width="1676" height="418" key="GridCell.Tab.1.left/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645430308924" />
+    <state width="1690" height="418" key="GridCell.Tab.1.left/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428685" />
+    <state width="1690" height="418" key="GridCell.Tab.1.right" timestamp="1648797428686">
+      <screen x="-49" y="-1415" width="2560" height="1415" />
+    </state>
+    <state width="1690" height="418" key="GridCell.Tab.1.right/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648628304741" />
+    <state width="1676" height="418" key="GridCell.Tab.1.right/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1645450214646" />
+    <state width="1676" height="418" key="GridCell.Tab.1.right/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645430308924" />
+    <state width="1690" height="418" key="GridCell.Tab.1.right/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1648797428686" />
+    <state x="524" y="309" key="Vcs.Push.Dialog.v2" timestamp="1649919847808">
+      <screen x="55" y="25" width="1737" height="1095" />
+    </state>
+    <state x="528" y="309" key="Vcs.Push.Dialog.v2/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1648433224165" />
+    <state x="642" y="-1048" key="Vcs.Push.Dialog.v2/-49.-1415.2560.1415/62.25.1730.1095@-49.-1415.2560.1415" timestamp="1647416812954" />
+    <state x="642" y="-1048" key="Vcs.Push.Dialog.v2/-49.-1415.2560.1415/71.25.1721.1095@-49.-1415.2560.1415" timestamp="1645671426577" />
+    <state x="537" y="309" key="Vcs.Push.Dialog.v2/-49.-1415.2560.1415/73.25.1719.1095@73.25.1719.1095" timestamp="1648799529561" />
+    <state x="642" y="-1048" key="Vcs.Push.Dialog.v2/-49.-1415.2560.1415/74.25.1718.1095@-49.-1415.2560.1415" timestamp="1641883652132" />
+    <state x="538" y="309" key="Vcs.Push.Dialog.v2/-49.-1415.2560.1415/74.25.1718.1095@74.25.1718.1095" timestamp="1641872510280" />
+    <state x="524" y="309" key="Vcs.Push.Dialog.v2/55.25.1737.1095@55.25.1737.1095" timestamp="1649919847808" />
+    <state x="526" y="309" key="Vcs.Push.Dialog.v2/58.25.1734.1095@58.25.1734.1095" timestamp="1649917570524" />
+    <state x="629" y="327" width="599" height="548" key="find.popup" timestamp="1649920953430">
+      <screen x="58" y="25" width="1734" height="1095" />
+    </state>
+    <state x="1292" y="-828" width="885" height="710" key="find.popup/-49.-1415.2560.1415/57.25.1735.1095@-49.-1415.2560.1415" timestamp="1648640698593" />
+    <state x="966" y="479" width="599" height="549" key="find.popup/-49.-1415.2560.1415/58.25.1734.1095@58.25.1734.1095" timestamp="1648629812289" />
+    <state x="967" y="479" width="599" height="549" key="find.popup/-49.-1415.2560.1415/60.25.1732.1095@60.25.1732.1095" timestamp="1649914786662" />
+    <state x="631" y="327" width="597" height="548" key="find.popup/-49.-1415.2560.1415/62.25.1730.1095@62.25.1730.1095" timestamp="1648039737499" />
+    <state x="793" y="-1025" width="884" height="709" key="find.popup/-49.-1415.2560.1415/66.25.1726.1095@-49.-1415.2560.1415" timestamp="1648023295228" />
+    <state x="791" y="379" width="598" height="550" key="find.popup/-49.-1415.2560.1415/66.25.1726.1095@66.25.1726.1095" timestamp="1648814358809" />
+    <state x="794" y="-1025" width="884" height="709" key="find.popup/-49.-1415.2560.1415/68.25.1724.1095@-49.-1415.2560.1415" timestamp="1645430329132" />
+    <state x="792" y="379" width="597" height="550" key="find.popup/-49.-1415.2560.1415/68.25.1724.1095@68.25.1724.1095" timestamp="1648806021436" />
+    <state x="793" y="-1025" width="884" height="709" key="find.popup/-49.-1415.2560.1415/71.25.1721.1095@-49.-1415.2560.1415" timestamp="1645671130015" />
+    <state x="638" y="327" width="594" height="548" key="find.popup/-49.-1415.2560.1415/71.25.1721.1095@71.25.1721.1095" timestamp="1645621939815" />
+    <state x="1136" y="-1171" width="883" height="634" key="find.popup/-49.-1415.2560.1415/73.25.1719.1095@-49.-1415.2560.1415" timestamp="1645517815371" />
+    <state x="795" y="379" width="595" height="550" key="find.popup/-49.-1415.2560.1415/73.25.1719.1095@73.25.1719.1095" timestamp="1648799406644" />
+    <state x="640" y="327" width="593" height="548" key="find.popup/-49.-1415.2560.1415/74.25.1718.1095@74.25.1718.1095" timestamp="1641872978792" />
+    <state x="629" y="327" width="599" height="548" key="find.popup/58.25.1734.1095@58.25.1734.1095" timestamp="1649920953430" />
+    <state x="630" y="327" width="598" height="548" key="find.popup/60.25.1732.1095@60.25.1732.1095" timestamp="1649916999579" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/cmd/chaos_agent.go</url>
+          <line>85</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/conn/connect/connect.go</url>
+          <line>90</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/web/handler/chaosblade.go</url>
+          <line>44</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/web/handler/chaosblade.go</url>
+          <line>43</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/web/handler/chaosblade.go</url>
+          <line>66</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/web/handler/uninstallAgent.go</url>
+          <line>43</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

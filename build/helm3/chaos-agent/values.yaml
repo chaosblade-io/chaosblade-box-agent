@@ -1,0 +1,32 @@
+# Default values for chaos.
+controller:
+  # controller.region_id: The region where the cluster is located, currently only support cn-hangzhou, cn-beijing, cn-shenzhen, cn-shanghai and cn-public(public region)
+  cluster_type: ""
+  # supported since 1.5.2 version
+  cluster_id: ""
+  cluster_name: ""
+
+# the image repository is related to the running env"
+images:
+  # chaos agent image named chaos-agent
+  chaos:
+    version: 1.0.0
+    repository:
+    # images.chaos.pullPolicy: must be Always|IfNotPresent|Never
+    pullPolicy: Always
+
+env:
+  # env.name: the cluster environment that is running
+  name: default
+  type: prod
+  mode: k8s_helm
+  debug: ""
+  qps: 50
+  reconcileCount: 50
+  logLevel: info
+
+transport:
+  endpoint: ""
+  port: 19527
+
+license: ""
