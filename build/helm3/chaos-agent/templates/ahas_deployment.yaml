@@ -60,6 +60,7 @@ spec:
             - '--transport.endpoint={{ .Values.transport.endpoint }}'
             {{ end }}
             - '--kubernetes.pod.report=true'
+            - '--kubernetes.externalIp.enable={{ .Values.controller.externalIp_enable }}'
           securityContext:
             privileged: true
           resources:

@@ -98,7 +98,8 @@ type Options struct {
 	ClusterId   string
 	ClusterName string
 	// k8s metric report flag
-	PodMetricFlag bool
+	PodMetricFlag    bool
+	ExternalIpEnable bool
 
 	// download url
 	ChaosAgentBinUrl string
@@ -184,6 +185,7 @@ func (o *Options) AddFlags() {
 	o.Flags.StringVar(&o.ClusterId, "kubernetes.cluster.id", "", "the cluster id")
 	o.Flags.StringVar(&o.ClusterName, "kubernetes.cluster.name", "", "the cluster name")
 	o.Flags.BoolVar(&o.PodMetricFlag, "kubernetes.pod.report", false, "the flag of pod metric")
+	o.Flags.BoolVar(&o.ExternalIpEnable, "kubernetes.externalIp.enable", false, "the flag of use external ip or not")
 
 	o.Flags.StringVar(&o.ChaosAgentBinUrl, "agent.bin.url", "", "the download url of chaos-agent binary")
 	o.Flags.StringVar(&o.ChaosAgentSHUrl, "agent.sh.url", "", "the download url of chaos-agent start shell")
