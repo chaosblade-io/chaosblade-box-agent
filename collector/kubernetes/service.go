@@ -54,7 +54,8 @@ type ServiceCollector struct {
 func NewServiceCollector(trans *transport.TransportClient, k8sChannel *kubernetes.Channel, opts metav1.ListOptions) *ServiceCollector {
 	uri, ok := transport.TransportUriMap[transport.API_K8S_SERVICE]
 	if !ok {
-		return nil
+		logrus.Warnf("service collector, get uri failed!")
+		//return nil
 	}
 	collector := createK8sBaseCollector(kubernetes.NodeResource, k8sChannel, trans, uri)
 
