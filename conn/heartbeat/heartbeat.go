@@ -37,7 +37,9 @@ func (chh *ClientHeartbeatHandler) Start() error {
 
 			uri := transport.TransportUriMap[transport.API_HEARTBEAT]
 
-			request.AddParam("ip", options.Opts.Ip)
+			if options.Opts.ExternalIpEnable {
+				request.AddParam("ip", options.Opts.Ip)
+			}
 			request.AddParam(options.AppInstanceKeyName, options.Opts.ApplicationInstance)
 			request.AddParam(options.AppGroupKeyName, options.Opts.ApplicationGroup)
 			chh.sendHeartbeat(uri, request)

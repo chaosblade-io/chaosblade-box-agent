@@ -5,6 +5,7 @@ controller:
   # supported since 1.5.2 version
   cluster_id: ""
   cluster_name: ""
+  externalIp_enable: false
 
 # the image repository is related to the running env"
 images:

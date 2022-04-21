@@ -5,6 +5,7 @@ export BLADE_VERSION = 1.5.0
 BLADE_SRC_ROOT=$(shell pwd)
 
 BUILD_BINARY_PATH=build/build_binary
+BUILD_HELM_PATH=build/helm3/chaos_agent
 BUILD_IMAGE_PATH=build/build_image
 BUILD_TARGET_PKG_DIR=$(BUILD_IMAGE_PATH)
 
@@ -36,6 +37,7 @@ build_linux:
     		agent-build-musl:latest
 
 build_image:
+	helm package $(BUILD_HELM_PATH)
 	cd $(BUILD_IMAGE_PATH)
 	docker build --pull --build-arg BLADE_VERSION=${BLADE_VERSION} -f $(BUILD_IMAGE_PATH)/Dockerfile \
 		-t chaos-agent:$(AGENT_VERSION) $(BLADE_SRC_ROOT)/$(BUILD_IMAGE_PATH)
