@@ -208,7 +208,7 @@ func (o *Options) SetOthersByFlags() {
 	o.Ip = o.GetPrivateIp()
 	o.HostName = o.GetHostName()
 	o.InstanceId = o.GetHostName()
-	o.Version = "1.0.0"
+	o.Version = "1.0.2"
 	o.InitApplicationInfo(o.ApplicationInstance, o.ApplicationGroup)
 
 	var err error
