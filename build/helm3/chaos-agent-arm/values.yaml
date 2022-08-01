@@ -12,7 +12,7 @@ images:
   # chaos agent image named chaos-agent
   chaos:
     version: 1.0.2
-    repository: chaosbladeio/chaosblade-agent
+    repository: chaosbladeio/chaosblade-agent-arm64
     # images.chaos.pullPolicy: must be Always|IfNotPresent|Never
     pullPolicy: Always
 

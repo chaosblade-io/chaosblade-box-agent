@@ -1,0 +1,2 @@
+Thank you for using the {{ .Release.Name }} service, you can check the service installation status by the following command：
+  kubectl get pods -n {{ .Release.Namespace }}.
