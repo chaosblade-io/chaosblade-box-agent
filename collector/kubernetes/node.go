@@ -73,10 +73,10 @@ func (collector *NodeCollector) getNodeInfo() ([]*NodeInfo, error) {
 
 		roles := findNodeRoles(node)
 		nodeInfo := &NodeInfo{
-			Uid:         string(node.UID),
-			Name:        node.Name,
-			ClusterId:   options.Opts.ClusterId,
-			ClusterName: node.ClusterName,
+			Uid:       string(node.UID),
+			Name:      node.Name,
+			ClusterId: options.Opts.ClusterId,
+			//ClusterName: node.ClusterName,
 		}
 		nodes = append(nodes, nodeInfo)
 		if len(roles) > 0 {

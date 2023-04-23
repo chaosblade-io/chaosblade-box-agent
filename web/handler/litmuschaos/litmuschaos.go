@@ -38,13 +38,12 @@ import (
 	"k8s.io/client-go/rest"
 	k8symaml "sigs.k8s.io/yaml"
 
-	v1alpha1 "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
-	chaosClient "github.com/litmuschaos/chaos-operator/pkg/client/clientset/versioned/typed/litmuschaos/v1alpha1"
-
 	"github.com/chaosblade-io/chaos-agent/conn/asyncreport"
 	"github.com/chaosblade-io/chaos-agent/pkg/kubernetes"
 	"github.com/chaosblade-io/chaos-agent/pkg/options"
 	"github.com/chaosblade-io/chaos-agent/pkg/tools"
+	v1alpha1 "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
+	chaosClient "github.com/litmuschaos/chaos-operator/pkg/client/clientset/versioned/typed/litmuschaos/v1alpha1"
 
 	//"github.com/chaosblade-io/chaos-agent/pkg/options"
 	"github.com/chaosblade-io/chaos-agent/transport"
@@ -83,17 +82,18 @@ func NewLitmusChaosHandler(transportClient *transport.TransportClient, k8sInstan
 
 func (lh *LitmusChaosHandler) Handle(request *transport.Request) *transport.Response {
 	chaosAction := request.Params["chaosAction"]
+	ctx := context.TODO()
 	if _, ok := options.CreateOperation[chaosAction]; ok {
-		return lh.createParamerAndExec(request)
+		return lh.createParamerAndExec(ctx, request)
 	} else if _, ok := options.DestroyOperation[chaosAction]; ok {
-		return lh.destroyParamerAndExec(request)
+		return lh.destroyParamerAndExec(ctx, request)
 	}
 
 	return transport.ReturnFail(transport.ServerError, fmt.Sprintf("litmus exec failed, no such action: %s", chaosAction))
 }
 
 // destroy
-func (lh *LitmusChaosHandler) destroyParamerAndExec(request *transport.Request) *transport.Response {
+func (lh *LitmusChaosHandler) destroyParamerAndExec(ctx context.Context, request *transport.Request) *transport.Response {
 	name, ok := request.Params["name"]
 	if !ok || name == "" {
 		logrus.Warnf("[litmus destroy] less parameter: `name`")
@@ -105,11 +105,11 @@ func (lh *LitmusChaosHandler) destroyParamerAndExec(request *transport.Request) 
 		namespace = coreV1.NamespaceDefault
 	}
 
-	return lh.destroyExec(name, namespace)
+	return lh.destroyExec(ctx, name, namespace)
 }
 
-func (lh *LitmusChaosHandler) destroyExec(name, namespace string) *transport.Response {
-	err := lh.LitmusClientSet.ChaosEngines(namespace).Delete(name, &metaV1.DeleteOptions{})
+func (lh *LitmusChaosHandler) destroyExec(ctx context.Context, name, namespace string) *transport.Response {
+	err := lh.LitmusClientSet.ChaosEngines(namespace).Delete(ctx, name, metaV1.DeleteOptions{})
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return transport.ReturnFail(transport.ServerError, fmt.Sprintf("litmus destroy engine failed, err: %s", err.Error()))
@@ -120,7 +120,7 @@ func (lh *LitmusChaosHandler) destroyExec(name, namespace string) *transport.Res
 }
 
 // create
-func (lh *LitmusChaosHandler) createParamerAndExec(request *transport.Request) *transport.Response {
+func (lh *LitmusChaosHandler) createParamerAndExec(ctx context.Context, request *transport.Request) *transport.Response {
 	name, _ := tools.GenerateUid()
 
 	namespace, ok := request.Params["namespace"]
@@ -155,15 +155,15 @@ func (lh *LitmusChaosHandler) createParamerAndExec(request *transport.Request) *
 		return transport.ReturnFail(transport.ParameterTypeError, "components")
 	}
 
-	return lh.createExec(experimentType, experimentName, namespace, name, appInfo, components)
+	return lh.createExec(ctx, experimentType, experimentName, namespace, name, appInfo, components)
 }
 
-func (lh *LitmusChaosHandler) createExec(experimentType, experimentName, namespace, name string, appInfo, components map[string]string) *transport.Response {
+func (lh *LitmusChaosHandler) createExec(ctx context.Context, experimentType, experimentName, namespace, name string, appInfo, components map[string]string) *transport.Response {
 	if options.Opts.LitmusChaosVerison == "" {
 		return transport.ReturnFail(transport.ServerError, "litmus operator not installed, please install first")
 	}
 
-	if err := lh.prepareLitmusExperiment(experimentType, experimentName, namespace); err != nil {
+	if err := lh.prepareLitmusExperiment(ctx, experimentType, experimentName, namespace); err != nil {
 		return transport.ReturnFail(transport.ServerError, fmt.Sprintf("litmus prepare experiment failed, err: %s", err.Error()))
 	}
 
@@ -171,17 +171,17 @@ func (lh *LitmusChaosHandler) createExec(experimentType, experimentName, namespa
 		return transport.ReturnFail(transport.ServerError, fmt.Sprintf("litmus prepare rbac failed, err: %s", err.Error()))
 	}
 
-	if err := lh.createEnginer(name, namespace, experimentName, appInfo, components); err != nil {
+	if err := lh.createEnginer(ctx, name, namespace, experimentName, appInfo, components); err != nil {
 		return transport.ReturnFail(transport.ServerError, fmt.Sprintf("litmus create enginer failed, err: %s", err.Error()))
 	}
 
 	// async report inject fault status
-	go lh.AsyncHandlerResultStatus(name, namespace, experimentName)
+	go lh.AsyncHandlerResultStatus(ctx, name, namespace, experimentName)
 
 	return transport.ReturnSuccess()
 }
 
-func (lh *LitmusChaosHandler) AsyncHandlerResultStatus(name, namespace, experimentName string) {
+func (lh *LitmusChaosHandler) AsyncHandlerResultStatus(ctx context.Context, name, namespace, experimentName string) {
 	status := "Unknown"
 	var errorStr string
 	time.Sleep(15 * time.Second)
@@ -189,7 +189,7 @@ func (lh *LitmusChaosHandler) AsyncHandlerResultStatus(name, namespace, experime
 		Times(90).
 		Wait(1 * time.Second).
 		Try(func(attempt uint) error {
-			chaosResult, err := lh.handlerResult(name, namespace, experimentName)
+			chaosResult, err := lh.handlerResult(ctx, name, namespace, experimentName)
 			if err != nil {
 				return err
 			}
@@ -228,8 +228,8 @@ func (lh *LitmusChaosHandler) AsyncHandlerResultStatus(name, namespace, experime
 	ar.ReportStatus(name, status, errorStr, LitmusHelmName, uri)
 }
 
-//prepareLitmus before inject fault, need create experiment
-func (lh *LitmusChaosHandler) prepareLitmusExperiment(experimentType, experimentName, namespace string) error {
+// prepareLitmus before inject fault, need create experiment
+func (lh *LitmusChaosHandler) prepareLitmusExperiment(ctx context.Context, experimentType, experimentName, namespace string) error {
 	//var crdsDefinition  *apiextensionv1beta1.CustomResourceDefinition
 	var expriment *v1alpha1.ChaosExperiment
 	litmusExperiment, err := DownloadLitmus(experimentType, experimentName, LITMUS_EXPERIMENT)
@@ -240,7 +240,7 @@ func (lh *LitmusChaosHandler) prepareLitmusExperiment(experimentType, experiment
 		return fmt.Errorf("experiment Unmarshal err. ", err.Error())
 	}
 
-	_, err = lh.LitmusClientSet.ChaosExperiments(namespace).Create(expriment)
+	_, err = lh.LitmusClientSet.ChaosExperiments(namespace).Create(ctx, expriment, metaV1.CreateOptions{})
 	if errors.IsAlreadyExists(err) {
 		return nil
 	}
@@ -379,7 +379,7 @@ func (lh *LitmusChaosHandler) createRoleAndRoleBinding(roleStr, roleBindingStr [
 	return nil
 }
 
-func (lh *LitmusChaosHandler) createEnginer(name, namespace, experimentName string, appInfo, components map[string]string) error {
+func (lh *LitmusChaosHandler) createEnginer(ctx context.Context, name, namespace, experimentName string, appInfo, components map[string]string) error {
 	var componentEnv []coreV1.EnvVar
 	for key, value := range components {
 		if value == "" {
@@ -420,7 +420,7 @@ func (lh *LitmusChaosHandler) createEnginer(name, namespace, experimentName stri
 			ChaosServiceAccount: experimentName + "-sa",
 			JobCleanUpPolicy:    "delete",
 			EngineState:         "active",
-			AnnotationCheck:     "false",
+			//AnnotationCheck:     "false",
 			Experiments: []v1alpha1.ExperimentList{
 				{
 					Name: experimentName,
@@ -436,17 +436,17 @@ func (lh *LitmusChaosHandler) createEnginer(name, namespace, experimentName stri
 	chaosEnginer.Kind = ENGINE_KIND
 	chaosEnginer.APIVersion = LITMUS_CRD_VERSION
 
-	_, err := lh.LitmusClientSet.ChaosEngines(namespace).Create(chaosEnginer)
+	_, err := lh.LitmusClientSet.ChaosEngines(namespace).Create(ctx, chaosEnginer, metaV1.CreateOptions{})
 	return err
 }
 
-func (lh *LitmusChaosHandler) handlerResult(name, namespace, experimentName string) (*v1alpha1.ChaosResult, error) {
+func (lh *LitmusChaosHandler) handlerResult(ctx context.Context, name, namespace, experimentName string) (*v1alpha1.ChaosResult, error) {
 	chaosResultName := fmt.Sprintf("%s-%s", name, experimentName)
 
-	return lh.LitmusClientSet.ChaosResults(namespace).Get(chaosResultName, metaV1.GetOptions{})
+	return lh.LitmusClientSet.ChaosResults(namespace).Get(ctx, chaosResultName, metaV1.GetOptions{})
 }
 
-//Download from oss
+// Download from oss
 func DownloadLitmus(experimentType, experimentName, objectType string) ([]byte, error) {
 	version := options.Opts.LitmusChaosVerison
 	localFilePath := fmt.Sprintf("%s/%s/%s/%s.yaml", version, experimentType, experimentName, objectType)
