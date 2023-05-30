@@ -1,4 +1,4 @@
-FROM golang:1.13.1
+FROM golang:1.20.1
 LABEL maintainer="Mingxia Cai"
 
 # # The image is used to build chaosblade for musl
