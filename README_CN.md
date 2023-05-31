@@ -1,4 +1,4 @@
-# Chaosblade-exec-os: 基础资源混沌实验场景执行器
+# Chaosblade-box-agent: 混沌工程探针
 ![license](https://img.shields.io/github/license/chaosblade-io/chaosblade.svg)
 
 ## 介绍
