@@ -11,7 +11,7 @@ controller:
 images:
   # chaos agent image named chaos-agent
   chaos:
-    version: 1.0.2
+    version: 1.0.3
     repository: chaosbladeio/chaosblade-agent
     # images.chaos.pullPolicy: must be Always|IfNotPresent|Never
     pullPolicy: Always
