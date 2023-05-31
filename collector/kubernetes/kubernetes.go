@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package kubernetes
 
 import (
@@ -339,7 +340,7 @@ func (mw *multiWatch) Stop() {
 	return
 }
 
-//common function
+// common function
 func getPodRestartCount(pod *v1.Pod) int32 {
 	count := int32(0)
 	for _, c := range pod.Status.ContainerStatuses {

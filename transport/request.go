@@ -1,3 +1,19 @@
+/*
+ * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package transport
 
 import (
@@ -45,7 +61,7 @@ func NewRequest() *Request {
 	return request
 }
 
-//AddHeader add metadata to it
+// AddHeader add metadata to it
 func (request *Request) AddHeader(key string, value string) *Request {
 	if key != "" {
 		request.Headers[key] = value
@@ -53,7 +69,7 @@ func (request *Request) AddHeader(key string, value string) *Request {
 	return request
 }
 
-//AddParam add request data to it
+// AddParam add request data to it
 func (request *Request) AddParam(key string, value string) *Request {
 	if key != "" {
 		request.Params[key] = value
@@ -148,7 +164,7 @@ type Uri struct {
 	CompressVersion string
 }
 
-//NewUri: create a new one
+// NewUri: create a new one
 func NewUri(serverName, handlerName string) Uri {
 	return Uri{
 		ServerName:      serverName,
