@@ -1,7 +1,8 @@
-FROM multiarch/alpine:arm64-edge
+FROM multiarch/alpine:arm64-v3.14
 LABEL maintainer="Mingxia Cai"
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+#RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN sed -i 's/https/http/' /etc/apk/repositories
 
 RUN apk add --update bash iproute2 util-linux curl openssl gcc musl-dev libpcap-dev audit coreutils \
     && mkdir -p /lib/modules/$(uname -r) \
