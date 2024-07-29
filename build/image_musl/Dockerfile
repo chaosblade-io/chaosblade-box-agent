@@ -1,7 +1,9 @@
-FROM alpine:3.8
+FROM alpine:3.18
 LABEL maintainer="Mingxia Cai"
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+#RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+
+RUN sed -i 's/https/http/' /etc/apk/repositories
 
 RUN apk add --update bash iproute2 util-linux curl openssl gcc musl-dev libpcap-dev audit coreutils \
     && mkdir -p /lib/modules/$(uname -r) \

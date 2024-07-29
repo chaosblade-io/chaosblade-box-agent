@@ -5,73 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a6002dcc-d6bf-42ab-8ef9-2da15f8f51ff" name="Default Changelist" comment="delete external ip to box">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/agent" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/binary_arm/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build/binary_arm/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/helm3/chaos-agent-arm/Chart.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/helm3/chaos-agent-arm/Chart.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/helm3/chaos-agent-arm/values.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/helm3/chaos-agent-arm/values.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/helm3/chaos-agent/Chart.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/helm3/chaos-agent/Chart.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/helm3/chaos-agent/values.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/helm3/chaos-agent/values.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/chaos_agent.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/chaos_agent.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/daemonset.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/daemonset.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/deployment.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/deployment.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/ingress.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/ingress.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/kubernetes.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/kubernetes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/namespace.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/namespace.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/node.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/pod.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/pod.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/replicaset.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/replicaset.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/types.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collector/kubernetes/virtualnode.go" beforeDir="false" afterPath="$PROJECT_DIR$/collector/kubernetes/virtualnode.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/asyncreport/asyncreport.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/asyncreport/asyncreport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/callback/callback.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/callback/callback.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/close/closer.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/close/closer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/conn.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/conn.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/connect/connect.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/connect/connect.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/heartbeat/heartbeat.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/heartbeat/heartbeat.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conn/metric/metric.go" beforeDir="false" afterPath="$PROJECT_DIR$/conn/metric/metric.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metricreport/metric.go" beforeDir="false" afterPath="$PROJECT_DIR$/metricreport/metric.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitor/checker.go" beforeDir="false" afterPath="$PROJECT_DIR$/monitor/checker.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/monitor/monitor.go" beforeDir="false" afterPath="$PROJECT_DIR$/monitor/monitor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/bash/bash.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/bash/bash.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/helm3/helm.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/helm3/helm.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/helm3/registry/resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/helm3/registry/resolver.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/http/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/http/http.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/kubernetes/kubernetes.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/kubernetes/kubernetes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/options/bladeoptions.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/options/bladeoptions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/options/chaostoolsoptions.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/options/chaostoolsoptions.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/options/options.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/options/options.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/auth.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/download.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/download.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/env.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/env.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/file.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/limitedlist.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/limitedlist.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/panic.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/panic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/set.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/set.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/signal.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/signal.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/tools/uuid.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/tools/uuid.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/chaosblade/chaosblade.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/chaosblade/chaosblade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transport/interceptor.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/interceptor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transport/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/request.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transport/response.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/response.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transport/transport.go" beforeDir="false" afterPath="$PROJECT_DIR$/transport/transport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/api/api.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/api/api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/api/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/api/handler.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/chaosblade.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/chaosblade.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/litmuschaos/installlitmus.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/litmuschaos/installlitmus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/litmuschaos/litmuschaos.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/litmuschaos/litmuschaos.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/litmuschaos/litmusdefault.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/litmuschaos/litmusdefault.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/litmuschaos/uninstalllitmus.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/litmuschaos/uninstalllitmus.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/ping.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/ping.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/uninstallAgent.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/uninstallAgent.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/handler/updateApplication.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/handler/updateApplication.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/server/gateway.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/gateway.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/server/http.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/server/http.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/type.go" beforeDir="false" afterPath="$PROJECT_DIR$/web/type.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/image_arm/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build/image_arm/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/image_musl/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/build/image_musl/Dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,6 +65,7 @@
     "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -130,23 +74,25 @@
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "last_opened_file_path": "/Users/caimingxia/go/github/chaosblade-box-agent",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
     "settings.editor.selected.configurable": "go.dep"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/build/helm3" />
+      <recent name="$PROJECT_DIR$/build/image_arm" />
+      <recent name="$PROJECT_DIR$/build/build_arm64" />
+      <recent name="$PROJECT_DIR$/build" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/build" />
       <recent name="$PROJECT_DIR$/collector/kubernetes" />
       <recent name="$PROJECT_DIR$/pkg/tools" />
       <recent name="$PROJECT_DIR$/web/server" />
       <recent name="$PROJECT_DIR$/web/handler/upgrade" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/build/helm3" />
-      <recent name="$PROJECT_DIR$/build/image_arm" />
-      <recent name="$PROJECT_DIR$/build/build_arm64" />
-      <recent name="$PROJECT_DIR$/build" />
-      <recent name="$PROJECT_DIR$/build/helm3/chaos-agent/templates" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build github.com/chaosblade-io/chaos-agent/cmd">
