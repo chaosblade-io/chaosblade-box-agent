@@ -69,12 +69,12 @@ func (ch *ChaosbladeHandler) exec(cmd string) *transport.Response {
 	fields := strings.Fields(cmd)
 
 	if len(fields) == 0 {
-		logrus.Warningf("less command parameters")
+		logrus.Warning("less command parameters")
 		return transport.ReturnFail(transport.ParameterLess, "command")
 	}
 	// 判断 chaosblade 是否存在
 	if !tools.IsExist(options.BladeBinPath) {
-		logrus.Warningf(transport.Errors[transport.ChaosbladeFileNotFound])
+		logrus.Warning(transport.Errors[transport.ChaosbladeFileNotFound])
 		return transport.ReturnFail(transport.ChaosbladeFileNotFound)
 	}
 	command := fields[0]

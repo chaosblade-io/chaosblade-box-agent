@@ -18,6 +18,7 @@ package options
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -60,17 +61,17 @@ var CtlPathFunc = func() string {
 // GetChaosBladeVersion
 func GetChaosBladeVersion() (string, error) {
 	if !tools.IsExist(BladeBinPath) {
-		return "", fmt.Errorf("blade bin file not exist")
+		return "", errors.New("blade bin file not exist")
 	}
 
 	result, errMsg, isSuccess := bash.ExecScript(context.TODO(), BladeBinPath, "version")
 	if !isSuccess {
-		return "", fmt.Errorf(errMsg)
+		return "", errors.New(errMsg)
 	}
 
 	versionInfos := strings.Split(strings.TrimSpace(result), "\n")
 	if len(versionInfos) == 0 {
-		return "", fmt.Errorf("cannot get blade version")
+		return "", errors.New("cannot get blade version")
 	}
 
 	versionInfo := versionInfos[0]

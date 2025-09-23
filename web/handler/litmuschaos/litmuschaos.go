@@ -238,7 +238,7 @@ func (lh *LitmusChaosHandler) prepareLitmusExperiment(ctx context.Context, exper
 		return err
 	}
 	if err = k8symaml.Unmarshal(litmusExperiment, &expriment); err != nil {
-		return fmt.Errorf("experiment Unmarshal err. ", err.Error())
+		return fmt.Errorf("experiment Unmarshal err: %v", err.Error())
 	}
 
 	_, err = lh.LitmusClientSet.ChaosExperiments(namespace).Create(ctx, expriment, metaV1.CreateOptions{})
