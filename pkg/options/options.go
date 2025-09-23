@@ -159,7 +159,7 @@ func NewOptions() {
 
 	err := Opts.Parse()
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Print(err.Error())
 		os.Exit(1)
 	}
 
