@@ -25,8 +25,7 @@ import (
 	"github.com/chaosblade-io/chaos-agent/web"
 )
 
-type HttpServer struct {
-}
+type HttpServer struct{}
 
 func NewHttpServer() web.APiServer {
 	return &HttpServer{}

@@ -66,7 +66,7 @@ func (ilh *InstallLitmusHandler) installLitmus(version string, vals map[string]s
 		logrus.Warnf("[install litmus] failed, err: helm instance is nil")
 		return transport.ReturnFail(transport.Helm3ExecError, "helm instance is nil")
 	}
-	//h := helm3.New(LitmusHelmName, LitmusHelmNamespace, buf)
+	// h := helm3.New(LitmusHelmName, LitmusHelmNamespace, buf)
 	chartUrl := getLitmusUrlByVersionAndEnv(version)
 
 	// pull chart to cache

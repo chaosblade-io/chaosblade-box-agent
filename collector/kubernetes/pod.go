@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -43,7 +43,8 @@ type PodCollector struct {
 }
 
 func NewPodCollector(trans *transport.TransportClient, k8sChannel *kubernetes.Channel,
-	serviceCollector *ServiceCollector, opts metav1.ListOptions) *PodCollector {
+	serviceCollector *ServiceCollector, opts metav1.ListOptions,
+) *PodCollector {
 	uri, ok := transport.TransportUriMap[transport.API_K8S_POD]
 	if !ok {
 		return nil
@@ -89,13 +90,13 @@ func (collector *PodCollector) getSelectors() []func(node podNode) {
 func (collector *PodCollector) getPodInfo(selectors []func(node podNode)) ([]*PodInfo, error) {
 	podList := collector.indexer.List()
 	logrus.Debugf("[POD REPORT] get pods from indexer len : %v", len(podList))
-	var pods = make([]*PodInfo, 0)
+	pods := make([]*PodInfo, 0)
 	for _, p := range podList {
 		pod, ok := p.(*v1.Pod)
 		if !ok {
 			continue
 		}
-		var status = getPodState(pod)
+		status := getPodState(pod)
 		// pod uid
 		podUid := string(pod.UID)
 		if hash, ok := pod.Annotations["kubernetes.io/config.hash"]; ok {
@@ -119,7 +120,7 @@ func (collector *PodCollector) getPodInfo(selectors []func(node podNode)) ([]*Po
 		podInfo = collector.handlePodIncrement(podInfo)
 		pods = append(pods, podInfo)
 		// 建立 pod 与 service 等的关系
-		for idx, _ := range selectors {
+		for idx := range selectors {
 			selectors[idx](podInfo)
 		}
 	}
@@ -163,7 +164,7 @@ func (collector *PodCollector) handlePodIncrement(podInfo *PodInfo) *PodInfo {
 func (collector *PodCollector) reportNotExistResource() {
 	// old pods
 	collector.IdentifierLock.Lock()
-	var pods = make([]*PodInfo, 0)
+	pods := make([]*PodInfo, 0)
 	podIdentifiers := collector.identifiers
 	logrus.Debugf("podIdentifiers len: %d", len(podIdentifiers))
 	if podIdentifiers != nil {

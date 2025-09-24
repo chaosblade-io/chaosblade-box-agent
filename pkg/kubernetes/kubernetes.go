@@ -39,8 +39,10 @@ const (
 	VirtualNodeResource = "virtualNodes"
 )
 
-var channel *Channel
-var once sync.Once
+var (
+	channel *Channel
+	once    sync.Once
+)
 
 type Channel struct {
 	ClientSet *kubernetes.Clientset

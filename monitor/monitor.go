@@ -18,11 +18,12 @@ package monitor
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/chaosblade-io/chaos-agent/transport"
 )
@@ -47,8 +48,10 @@ type checker interface {
 	check() monitorAction
 }
 
-var instance *monitor
-var cLock sync.Mutex
+var (
+	instance *monitor
+	cLock    sync.Mutex
+)
 
 func (this *monitorAction) recover() {
 	this.needStart = false
@@ -79,7 +82,6 @@ func GetMonitorInstance(transportClient *transport.TransportClient) *monitor {
 
 func (this *monitor) Start() {
 	go this.doMonitor()
-
 }
 
 func (this *monitor) doMonitor() {
@@ -113,7 +115,6 @@ func (this *monitor) StopWithReason(reason string) {
 	logrus.Warningf("[Controller] send stop event to server, reason: %s", reason)
 	go this.sendEventToServer("stop", reason)
 	// todo 因为现在没有数据收集，所以不需要controller.stop，去关停数据收集相关的controller
-
 }
 
 func (this *monitor) StartWithReason(reason string) {

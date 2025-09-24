@@ -47,6 +47,7 @@ func (ulh *UninstallLitmusHandler) Handle(request *transport.Request) *transport
 
 	return ulh.uninstallLitmus()
 }
+
 func (ulh *UninstallLitmusHandler) uninstallLitmus() *transport.Response {
 	err := ulh.Helm.Uninstall()
 	if err != nil {

@@ -54,10 +54,12 @@ type Constants struct {
 	Bucket             string
 }
 
-var chaosPath string
-var metricPath string
-var agentPath string
-var chaosLogFilePath string
+var (
+	chaosPath        string
+	metricPath       string
+	agentPath        string
+	chaosLogFilePath string
+)
 
 // GetUserHome return user home.
 func GetUserHome() string {
@@ -104,7 +106,7 @@ func GetMetricDirectory() string {
 	}
 	metricPath = path.Join(GetCurrentDirectory(), "metric")
 	if !IsExist(metricPath) {
-		err := os.MkdirAll(metricPath, 0755)
+		err := os.MkdirAll(metricPath, 0o755)
 		if err != nil {
 			logrus.Fatalln("Cannot get metric path")
 			return GetCurrentDirectory()
@@ -130,7 +132,7 @@ func GetAgentDirectory() string {
 	}
 	agentPath = path.Join(GetCurrentDirectory(), "agent")
 	if !IsExist(agentPath) {
-		err := os.MkdirAll(agentPath, 0755)
+		err := os.MkdirAll(agentPath, 0o755)
 		if err != nil {
 			logrus.Fatalln("Cannot get java agent path")
 			return GetCurrentDirectory()

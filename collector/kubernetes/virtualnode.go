@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -80,7 +80,6 @@ func NewVirtualNodeCollector(trans *transport.TransportClient, k8sChannel *kuber
 }
 
 func (collector *VirtualNodeCollector) Report() {
-
 	if collector.indexer == nil {
 		// 需要构建reflector
 		if collector.k8sChannel.ClientSet == nil {
@@ -104,7 +103,7 @@ func (collector *VirtualNodeCollector) Report() {
 func (collector *VirtualNodeCollector) getVirtualNodeInfo() ([]*VirtualNodeInfo, error) {
 	list := collector.nodeIndex.List()
 	logrus.Debugf("[VIRTUALNODE REPORT] get virtualnodes from lister, size: %d, listkey : %v", len(list), collector.nodeIndex.ListKeys())
-	var nodes = make([]*VirtualNodeInfo, 0)
+	nodes := make([]*VirtualNodeInfo, 0)
 	for _, n := range list {
 		node := n.(*v1.Node)
 		roles := findNodeRoles(node)
@@ -161,10 +160,10 @@ func (collector *VirtualNodeCollector) getPods(node *v1.Node) ([]PodInfo, error)
 	list := collector.podIndex[node.Name].List()
 	listkey := collector.podIndex[node.Name].ListKeys()
 	logrus.Debugf("[VIRTUALNODE REPORT] get pods in node : %s, pod len: %d, pod keys : %v", node.Name, len(list), listkey)
-	var pods = make([]PodInfo, 0)
+	pods := make([]PodInfo, 0)
 	for _, p := range list {
 		pod := p.(*v1.Pod)
-		var status = getPodState(pod)
+		status := getPodState(pod)
 		// pod uid
 		podUid := string(pod.UID)
 		if hash, ok := pod.Annotations["kubernetes.io/config.hash"]; ok {
@@ -223,7 +222,7 @@ func (collector *VirtualNodeCollector) handleVirtualNodeIncrement(virtualNodeInf
 
 func (collector *VirtualNodeCollector) reportNotExistResource() {
 	// old pods
-	var pods = make([]PodInfo, 0)
+	pods := make([]PodInfo, 0)
 	podIdentifiers := collector.secondIdentifiers
 	logrus.Debugf("[VIRTUALNODE REPORT] virtualPodIdentifiers len: %d", len(podIdentifiers))
 	if podIdentifiers != nil {
@@ -246,7 +245,7 @@ func (collector *VirtualNodeCollector) reportNotExistResource() {
 		}
 	}
 
-	var nodes = make([]*VirtualNodeInfo, 0)
+	nodes := make([]*VirtualNodeInfo, 0)
 	identifiers := collector.identifiers
 	logrus.Debugf("[VIRTUALNODE REPORT] virtualNodeIdentifiers len: %d", len(identifiers))
 	if identifiers != nil {
@@ -302,6 +301,7 @@ func (collector *VirtualNodeCollector) handlePodInfoIncrement(podInfo *PodInfo) 
 	}
 	return *podInfo
 }
+
 func createVirtualnodeListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
@@ -312,6 +312,7 @@ func createVirtualnodeListWatch(kubeClient clientset.Interface, ns string, optio
 		},
 	}
 }
+
 func createVirtualnodepodListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

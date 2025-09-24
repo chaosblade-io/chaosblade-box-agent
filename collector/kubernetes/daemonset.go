@@ -87,7 +87,7 @@ func (collector *DaemonsetCollector) Report() {
 func (collector *DaemonsetCollector) getDaemonsetInfo() ([]*DaemonsetInfo, error) {
 	list := collector.indexer.List()
 	logrus.Debugf("[DAEMONSET REPORT] daemonset list len: %v", len(list))
-	var daemonsets = make([]*DaemonsetInfo, 0)
+	daemonsets := make([]*DaemonsetInfo, 0)
 	for _, dm := range list {
 		d := dm.(*v1.DaemonSet)
 		daemonsetInfo := &DaemonsetInfo{
@@ -150,7 +150,7 @@ func (collector *DaemonsetCollector) handleDaemonsetIncrement(daemonsetInfo *Dae
 
 func (collector *DaemonsetCollector) reportNotExistResource() {
 	// old Daemonsets
-	var daemonsets = make([]*DaemonsetInfo, 0)
+	daemonsets := make([]*DaemonsetInfo, 0)
 	collector.IdentifierLock.Lock()
 	daemonsetIdentifiers := collector.identifiers
 	logrus.Debugf("daemonsetIdentifiers len: %d", len(daemonsetIdentifiers))
@@ -176,6 +176,7 @@ func (collector *DaemonsetCollector) reportNotExistResource() {
 	}
 	collector.reportK8sMetric(metav1.NamespaceAll, false, daemonsets, len(daemonsets))
 }
+
 func createDaemonSetListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

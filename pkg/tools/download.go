@@ -29,7 +29,7 @@ func Download(destFileFullPath, url string) error {
 	if err != nil {
 		return err
 	}
-	os.Chmod(destFileFullPath, 0744)
+	os.Chmod(destFileFullPath, 0o744)
 	defer file.Close()
 
 	// 2. get body from url

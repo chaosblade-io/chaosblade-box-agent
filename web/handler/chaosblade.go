@@ -120,7 +120,7 @@ func (ch *ChaosbladeHandler) handleCacheAndSafePoint(cmdline, command, arg strin
 		ch.running[uid] = cmdline
 		// 设置安全点
 		// todo 这里是后面的update会用到，后面看下
-		//ch.upgrade.SetUnsafePoint(serviceName)
+		// ch.upgrade.SetUnsafePoint(serviceName)
 
 		if isJavaAgentInstall(command, arg) {
 			// 先记录安全点，如果失败，则删除安全点
@@ -131,12 +131,12 @@ func (ch *ChaosbladeHandler) handleCacheAndSafePoint(cmdline, command, arg strin
 		}
 	} else if isDestroyOrRevokeCmd(command) {
 		// 删除已停止的演练, arg=uid
-		var uid = arg
+		uid := arg
 		if _, ok := ch.running[uid]; ok {
 			delete(ch.running, uid)
 			// 删除安全点
 			// todo 同上
-			//ch.upgrade.DeleteUnsafePoint(serviceName)
+			// ch.upgrade.DeleteUnsafePoint(serviceName)
 		}
 		// 判断是否是 revoke
 		if isRevokeOperation(command) {
@@ -159,7 +159,8 @@ func (ch *ChaosbladeHandler) handleCacheAndSafePoint(cmdline, command, arg strin
 }
 
 func (ch *ChaosbladeHandler) checkAndReportJavaAgentStatus(uid string, reportFunc func(uid, status, errorMsg string, uri transport.Uri),
-	callbackFunc func(uid, status string)) {
+	callbackFunc func(uid, status string),
+) {
 	logrus.Debugf("start checkAndReportJavaAgentStatus...")
 	status, errorMsg := ch.timingCheckStatus(uid)
 	// 处理缓存回调
@@ -173,8 +174,10 @@ func (ch *ChaosbladeHandler) checkAndReportJavaAgentStatus(uid string, reportFun
 
 	reportFunc(uid, status, errorMsg, uri)
 }
+
 func (ch *ChaosbladeHandler) checkAndReportJavaAgentUninstallStatus(uid string, reportFunc func(uid, status, errorMsg string, uri transport.Uri),
-	callbackFunc func(uid, status string)) {
+	callbackFunc func(uid, status string),
+) {
 	logrus.Debugf("start checkAndReportJavaAgentUninstallStatus...")
 	status, errorMsg := ch.timingCheckStatus(uid)
 	// 处理缓存回调
@@ -187,6 +190,7 @@ func (ch *ChaosbladeHandler) checkAndReportJavaAgentUninstallStatus(uid string, 
 	}
 	reportFunc(uid, status, errorMsg, uri)
 }
+
 func (ch *ChaosbladeHandler) checkAndReportAsyncStatus(uid string, reportFunc func(uid, status, errorMsg string, uri transport.Uri)) {
 	logrus.Debugf("start checkAndReportAsyncStatus...")
 	status, errorMsg := ch.timingCheckStatus(uid)
@@ -254,7 +258,7 @@ func (ch *ChaosbladeHandler) deleteCallback(uid, status string) {
 		if _, ok := ch.running[uid]; ok {
 			delete(ch.running, uid)
 			// todo 安全点这个暂时往后放
-			//ch.upgrade.DeleteUnsafePoint(serviceName)
+			// ch.upgrade.DeleteUnsafePoint(serviceName)
 		}
 	}
 }
@@ -357,6 +361,7 @@ func isRevokeOperation(command string) bool {
 	}
 	return false
 }
+
 func isAsyncCreate(cmd string) bool {
 	cmds := strings.Fields(cmd)
 	if _, ok := options.CreateOperation[cmds[0]]; !ok {

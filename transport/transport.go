@@ -30,8 +30,8 @@ import (
 type TransportChannel interface {
 	DoInvoker(uri Uri, jsonParam string) (string, error)
 
-	//Init(config ServerConfig) error
-	//Call(outerReqId string, rpcMetadata Metadata, jsonParam string) (string, error)
+	// Init(config ServerConfig) error
+	// Call(outerReqId string, rpcMetadata Metadata, jsonParam string) (string, error)
 }
 
 type Metadata struct {
@@ -122,7 +122,7 @@ func (tc *TransportClient) Invoke(uri Uri, request *Request, needInterceptor boo
 
 	// set requestId
 
-	var requestId = tools.GetUUID()
+	requestId := tools.GetUUID()
 	request.AddHeader("rid", requestId)
 	uri.RequestId = requestId
 

@@ -63,7 +63,7 @@ type RegistryClientTestSuite struct {
 func (suite *RegistryClientTestSuite) SetupSuite() {
 	suite.CacheRootDir = testCacheRootDir
 	os.RemoveAll(suite.CacheRootDir)
-	os.Mkdir(suite.CacheRootDir, 0700)
+	os.Mkdir(suite.CacheRootDir, 0o700)
 
 	var out bytes.Buffer
 	suite.Out = &out
@@ -101,7 +101,7 @@ func (suite *RegistryClientTestSuite) SetupSuite() {
 	pwBytes, err := bcrypt.GenerateFromPassword([]byte(testPassword), bcrypt.DefaultCost)
 	suite.Nil(err, "no error generating bcrypt password for test htpasswd file")
 	htpasswdPath := filepath.Join(suite.CacheRootDir, testHtpasswdFileBasename)
-	err = ioutil.WriteFile(htpasswdPath, []byte(fmt.Sprintf("%s:%s\n", testUsername, string(pwBytes))), 0644)
+	err = ioutil.WriteFile(htpasswdPath, []byte(fmt.Sprintf("%s:%s\n", testUsername, string(pwBytes))), 0o644)
 	suite.Nil(err, "no error creating test htpasswd file")
 
 	// Registry config
@@ -165,7 +165,6 @@ func (suite *RegistryClientTestSuite) Test_1_SaveChart() {
 }
 
 func (suite *RegistryClientTestSuite) Test_2_LoadChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -182,7 +181,6 @@ func (suite *RegistryClientTestSuite) Test_2_LoadChart() {
 }
 
 func (suite *RegistryClientTestSuite) Test_3_PushChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -197,7 +195,6 @@ func (suite *RegistryClientTestSuite) Test_3_PushChart() {
 }
 
 func (suite *RegistryClientTestSuite) Test_4_PullChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -217,7 +214,6 @@ func (suite *RegistryClientTestSuite) Test_5_PrintChartTable() {
 }
 
 func (suite *RegistryClientTestSuite) Test_6_RemoveChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)

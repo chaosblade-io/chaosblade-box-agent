@@ -26,7 +26,7 @@ import (
 )
 
 func servicePortsToString(ports []v1.ServicePort) []string {
-	var ps = make([]string, 0)
+	ps := make([]string, 0)
 	for _, port := range ports {
 		// "32242->80/TCP/http"
 		ps = append(ps, fmt.Sprintf("%d->%d/%s/%s", port.NodePort, port.Port, port.Protocol, port.Name))

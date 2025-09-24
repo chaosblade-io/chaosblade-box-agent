@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -56,7 +56,7 @@ func NewServiceCollector(trans *transport.TransportClient, k8sChannel *kubernete
 	uri, ok := transport.TransportUriMap[transport.API_K8S_SERVICE]
 	if !ok {
 		logrus.Warnf("service collector, get uri failed!")
-		//return nil
+		// return nil
 	}
 	collector := createK8sBaseCollector(kubernetes.NodeResource, k8sChannel, trans, uri)
 
@@ -85,7 +85,6 @@ func (collector *ServiceCollector) Report() {
 
 	collector.reportK8sMetric(metav1.NamespaceAll, true, infos, len(infos))
 	collector.reportNotExistResource()
-
 }
 
 func (collector *ServiceCollector) SetSelector() {
@@ -106,14 +105,13 @@ func (collector *ServiceCollector) SetSelector() {
 	collector.SelectorLock.Lock()
 	collector.selectors = selectors
 	collector.SelectorLock.Unlock()
-
 }
 
 // getServiceInfo
 func (collector *ServiceCollector) getServiceInfo() ([]*ServiceInfo, []func(node podNode), error) {
 	list := collector.indexer.List()
 	logrus.Debugf("[SERVICE REPORT] get services from indexer, len: %d, list keys: %v", len(list), collector.indexer.ListKeys())
-	var services = make([]*ServiceInfo, 0)
+	services := make([]*ServiceInfo, 0)
 	selectors := make([]func(node podNode), 0)
 	for _, srv := range list {
 		s := srv.(*v1.Service)
@@ -181,7 +179,7 @@ func (collector *ServiceCollector) handleServiceIncrement(serviceInfo *ServiceIn
 
 func (collector *ServiceCollector) reportNotExistResource() {
 	// old service
-	var services = make([]*ServiceInfo, 0)
+	services := make([]*ServiceInfo, 0)
 	collector.IdentifierLock.Lock()
 	serviceIdentifiers := collector.identifiers
 	logrus.Debugf("serviceIdentifiers len: %d", len(serviceIdentifiers))

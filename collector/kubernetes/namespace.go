@@ -94,7 +94,7 @@ func (collector *NamespaceCollector) getNamespaces() ([]string, error) {
 
 func (collector *NamespaceCollector) getNamespaceInfo() ([]*NamespaceInfo, error) {
 	list := collector.indexer.List()
-	var namespaces = make([]*NamespaceInfo, 0)
+	namespaces := make([]*NamespaceInfo, 0)
 	for _, ns := range list {
 		namespace := ns.(*v1.Namespace)
 		namespaceInfo := &NamespaceInfo{
@@ -146,7 +146,7 @@ func (collector *NamespaceCollector) handleNamespaceIncrement(namespaceInfo *Nam
 
 func (collector *NamespaceCollector) reportNotExistResource() {
 	// old pods
-	var namespaces = make([]*NamespaceInfo, 0)
+	namespaces := make([]*NamespaceInfo, 0)
 	collector.IdentifierLock.Lock()
 	identifiers := collector.identifiers
 	logrus.Debugf("[NAMESPACE REPORT] namespaceIdentifiers len: %d", len(identifiers))
@@ -174,7 +174,6 @@ func (collector *NamespaceCollector) reportNotExistResource() {
 }
 
 func createNamespaceListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
-
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			return kubeClient.CoreV1().Namespaces().List(context.TODO(), options)

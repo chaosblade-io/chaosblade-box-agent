@@ -18,10 +18,11 @@ package tools
 
 import (
 	"container/list"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"strings"
 	"sync"
+
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type LimitedList struct {

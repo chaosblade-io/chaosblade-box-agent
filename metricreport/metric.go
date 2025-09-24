@@ -33,8 +33,7 @@ type MetricCollector interface {
 	Report()
 }
 
-//var ReportMetricConfigDatas *ReportMetricConfigMap
-
+// var ReportMetricConfigDatas *ReportMetricConfigMap
 type ReportMetricConfigMap struct {
 	sync.RWMutex
 	K8sChannel *k8s.Channel
@@ -61,13 +60,13 @@ func New(k8sChannel *k8s.Channel, trans *transport.TransportClient) *ReportMetri
 		Transport:          trans,
 		ReportMetricConfig: make(map[string]ReportMetricConfig, 0),
 	}
-	//return ReportMetricConfigDatas
+	// return ReportMetricConfigDatas
 }
 
 func (rmc *ReportMetricConfigMap) InitMetricConfig() {
 	// pod
 	opts := metav1.ListOptions{
-		//FieldSelector: "spec.nodeName=" + LocalNodeName,
+		// FieldSelector: "spec.nodeName=" + LocalNodeName,
 	}
 	serviceCollector := kubernetes.NewServiceCollector(rmc.Transport, rmc.K8sChannel, opts)
 	podCollector := kubernetes.NewPodCollector(rmc.Transport, rmc.K8sChannel, serviceCollector, opts)

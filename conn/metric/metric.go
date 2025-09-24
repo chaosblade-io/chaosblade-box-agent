@@ -27,7 +27,7 @@ import (
 )
 
 type ClientMetricHandler struct {
-	//metricReportConfig options.MetricReportConfig
+	// metricReportConfig options.MetricReportConfig
 	reportMetricConfigMap *metricreport.ReportMetricConfigMap
 	transportClient       *transport.TransportClient
 }
@@ -35,7 +35,7 @@ type ClientMetricHandler struct {
 // config options.MetricReportConfig,
 func NewClientMetricHandler(transportClient *transport.TransportClient, reportMetricConfigMap *metricreport.ReportMetricConfigMap) *ClientMetricHandler {
 	return &ClientMetricHandler{
-		//metricReportConfig: config,
+		// metricReportConfig: config,
 
 		reportMetricConfigMap: reportMetricConfigMap,
 		transportClient:       transportClient,
@@ -43,8 +43,8 @@ func NewClientMetricHandler(transportClient *transport.TransportClient, reportMe
 }
 
 func (cmh *ClientMetricHandler) Start() error {
-	//metricreport.ReportMetricConfigDatas.RLock()
-	//defer metricreport.ReportMetricConfigDatas.RUnlock()
+	// metricreport.ReportMetricConfigDatas.RLock()
+	// defer metricreport.ReportMetricConfigDatas.RUnlock()
 	cmh.reportMetricConfigMap.RLock()
 	defer cmh.reportMetricConfigMap.RUnlock()
 
@@ -59,7 +59,7 @@ func (cmh *ClientMetricHandler) Start() error {
 		go func() {
 			defer tools.PanicPrintStack()
 			for range ticker.C {
-				//metricreport.ReportMetricConfigDatas.RLock()
+				// metricreport.ReportMetricConfigDatas.RLock()
 				go reportMetricConfigData.Report()
 			}
 		}()
@@ -76,11 +76,10 @@ func (cmh *ClientMetricHandler) Stop(stopCh chan bool) error {
 	cmh.reportMetricConfigMap.RLock()
 	defer cmh.reportMetricConfigMap.RUnlock()
 
-	for metricName, _ := range cmh.reportMetricConfigMap.ReportMetricConfig {
+	for metricName := range cmh.reportMetricConfigMap.ReportMetricConfig {
 		if err := cmh.reportMetricConfigMap.CloseEnable(metricName); err != nil {
 			return err
 		}
-
 	}
 
 	return nil

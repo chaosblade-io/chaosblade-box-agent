@@ -17,11 +17,12 @@
 package tools
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
+
+	"github.com/sirupsen/logrus"
 )
 
 type ShutdownHook interface {
