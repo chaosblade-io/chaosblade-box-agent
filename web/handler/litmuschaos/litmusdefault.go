@@ -91,7 +91,7 @@ type Definition struct {
 	Image string `json:"image"`
 	// ImagePullPolicy of the chaos experiment container
 	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
-	//Scope specifies the service account scope (& thereby blast radius) of the experiment
+	// Scope specifies the service account scope (& thereby blast radius) of the experiment
 	Scope string `json:"scope"`
 	// List of Permission needed for a service account to execute experiment
 	Permissions []rbacV1.PolicyRule `json:"permissions"`

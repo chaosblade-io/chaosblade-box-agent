@@ -51,7 +51,7 @@ func NewHttpClient(config options.TransportConfig) (transport.TransportChannel, 
 		return nil, errors.New("transport endpoint is empty")
 	}
 	hostAndPort := strings.SplitN(config.Endpoint, ":", 2)
-	var port = 80
+	port := 80
 	if len(hostAndPort) > 1 {
 		port, _ = strconv.Atoi(hostAndPort[1])
 	}

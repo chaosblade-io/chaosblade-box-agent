@@ -22,7 +22,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 func GetUUID() string {

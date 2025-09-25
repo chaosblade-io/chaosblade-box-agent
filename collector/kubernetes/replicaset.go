@@ -85,7 +85,7 @@ func (collector *ReplicaSetCollector) Report() {
 func (collector *ReplicaSetCollector) getReplicaSetInfo() ([]*ReplicaSetInfo, error) {
 	list := collector.indexer.List()
 	logrus.Debugf("[REPLICASET REPORT] get replicasets from lister, size: %d", len(list))
-	var replicaSets = make([]*ReplicaSetInfo, 0)
+	replicaSets := make([]*ReplicaSetInfo, 0)
 	for _, r := range list {
 		rs := r.(*appsv1.ReplicaSet)
 		replicaSetInfo := &ReplicaSetInfo{
@@ -151,7 +151,7 @@ func (collector *ReplicaSetCollector) handleReplicaSetIncrement(replicaSetInfo *
 
 func (collector *ReplicaSetCollector) reportNotExistResource() {
 	// old rs
-	var replicaSets = make([]*ReplicaSetInfo, 0)
+	replicaSets := make([]*ReplicaSetInfo, 0)
 	collector.IdentifierLock.Lock()
 	rsIdentifiers := collector.identifiers
 	logrus.Debugf("[REPLICASET REPORT] rsIdentifiers len: %d", len(rsIdentifiers))
@@ -177,6 +177,7 @@ func (collector *ReplicaSetCollector) reportNotExistResource() {
 	collector.IdentifierLock.Unlock()
 	collector.reportK8sMetric(metav1.NamespaceAll, false, replicaSets, len(replicaSets))
 }
+
 func createReplicaSetListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

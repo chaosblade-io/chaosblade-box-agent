@@ -24,8 +24,7 @@ import (
 	"github.com/chaosblade-io/chaos-agent/transport"
 )
 
-type UpdateApplicationHandler struct {
-}
+type UpdateApplicationHandler struct{}
 
 func NewUpdateApplicationHandler() *UpdateApplicationHandler {
 	return &UpdateApplicationHandler{}

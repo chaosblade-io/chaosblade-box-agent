@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -83,7 +83,7 @@ func (collector *NodeCollector) Report() {
 func (collector *NodeCollector) getNodeInfo() ([]*NodeInfo, error) {
 	list := collector.indexer.List()
 	logrus.Debugf("[NODE REPORT] get nodes from lister, size: %d, listkey : %v", len(list), collector.indexer.ListKeys())
-	var nodes = make([]*NodeInfo, 0)
+	nodes := make([]*NodeInfo, 0)
 	for _, n := range list {
 		node := n.(*v1.Node)
 
@@ -92,7 +92,7 @@ func (collector *NodeCollector) getNodeInfo() ([]*NodeInfo, error) {
 			Uid:       string(node.UID),
 			Name:      node.Name,
 			ClusterId: options.Opts.ClusterId,
-			//ClusterName: node.ClusterName,
+			// ClusterName: node.ClusterName,
 		}
 		nodes = append(nodes, nodeInfo)
 		if len(roles) > 0 {

@@ -113,7 +113,7 @@ const (
 	// service
 	Chaos = "Chaos" // replace
 
-	//handler
+	// handler
 	MKChaosbladeAsync = "chaos/chaosbladeAsync"
 
 	HttpHandlerRegister           = "chaos/AgentRegister"
@@ -124,7 +124,7 @@ const (
 	HttpHandlerJavaAgentUninstall = "chaos/javaAgentUninstall"
 	HttpHandlerAgentEvent         = "chaos/AgentEvent"
 
-	//k8s metric
+	// k8s metric
 	HttpHandlerK8sVirtualNode = "chaos/k8sVirtualNode"
 	HttpHandlerK8sPod         = "chaos/k8sPod"
 )

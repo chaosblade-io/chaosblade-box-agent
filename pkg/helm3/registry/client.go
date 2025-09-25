@@ -177,7 +177,6 @@ func (c *Client) PullChart(ref *Reference) (*bytes.Buffer, error) {
 		switch layer.MediaType {
 		case HelmChartContentLayerMediaType:
 			contentLayer = &layer
-
 		}
 	}
 

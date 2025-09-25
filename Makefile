@@ -62,3 +62,31 @@ build_image_arm:
 	cp $(BUILD_BINARY_PATH)/agent $(BUILD_IMAGE_ARM64_PATH)
 	docker build --pull --build-arg BLADE_VERSION=${BLADE_VERSION} -f $(BUILD_IMAGE_ARM64_PATH)/Dockerfile \
 		-t chaosbladeio/chaosblade-agent-arm64:$(AGENT_VERSION) $(BLADE_SRC_ROOT)/$(BUILD_IMAGE_ARM64_PATH)
+
+.PHONY: format
+format:
+	@echo "Running goimports and gofumpt to format Go code..."
+	@./hack/update-imports.sh
+	@./hack/update-gofmt.sh
+
+.PHONY: verify
+verify:
+	@echo "Verifying Go code formatting and import order..."
+	@./hack/verify-gofmt.sh
+	@./hack/verify-imports.sh
+
+.PHONY: help
+help:
+	@echo "Makefile commands:"
+	@echo "  build             - Build the chaos agent binary"
+	@echo "  build_darwin     - Build the chaos agent binary and image for Darwin"
+	@echo "  build_binary     - Build only the chaos agent binary"
+	@echo "  build_linux      - Build the chaos agent binary for Linux using Docker"
+	@echo "  build_arm64      - Build the chaos agent binary for ARM64 using Docker"
+	@echo "  build_chart      - Package the Helm chart for the chaos agent"
+	@echo "  build_image      - Build the Docker image for the chaos agent (Linux)"
+	@echo "  build_image_arm  - Build the Docker image for the chaos agent (ARM64)"
+	@echo "  format           - Format Go code using goimports and gofumpt"
+	@echo "  verify           - Verify Go code formatting and import order"
+	@echo "  clean            - Clean up build artifacts"
+	@echo "  help             - Show this help message"

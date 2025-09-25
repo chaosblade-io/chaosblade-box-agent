@@ -18,7 +18,7 @@ package version
 
 var (
 	AgentVersion = "unknow"
-	//BladeVersion = "unknow"
+	// BladeVersion = "unknow"
 	Env       = "unknown"
 	BuildTime = "unknown"
 )

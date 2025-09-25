@@ -22,8 +22,7 @@ import (
 	"github.com/chaosblade-io/chaos-agent/transport"
 )
 
-type PingHandler struct {
-}
+type PingHandler struct{}
 
 func NewPingHandler() *PingHandler {
 	return &PingHandler{}

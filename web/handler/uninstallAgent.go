@@ -55,5 +55,4 @@ func (ph *UninstallInstallHandler) Handle(request *transport.Request) *transport
 	}
 
 	return transport.ReturnSuccess()
-
 }

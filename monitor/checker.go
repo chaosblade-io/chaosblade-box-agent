@@ -20,25 +20,27 @@ import (
 	"bytes"
 	"container/list"
 	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/chaosblade-io/chaos-agent/conn/heartbeat"
 )
 
-type defaultChecker struct {
-}
+type defaultChecker struct{}
 
 var hbAlreadyStoped = false
 
-var hbStopThreshold = 12
-var hbStartThreshold = 3
+var (
+	hbStopThreshold  = 12
+	hbStartThreshold = 3
+)
 
 func (*defaultChecker) check() monitorAction {
 	action := monitorAction{}
 	action.recover()
 
-	//todo: 这里暂时没有cpu\memory的兜底策略，因为暂时不收集process数据
+	// todo: 这里暂时没有cpu\memory的兜底策略，因为暂时不收集process数据
 
 	checkHeartBeat(&action)
 	if action.needStop {
@@ -52,7 +54,7 @@ func (*defaultChecker) check() monitorAction {
 		hbAlreadyStoped = false
 	}
 
-	//finally
+	// finally
 	return action
 }
 

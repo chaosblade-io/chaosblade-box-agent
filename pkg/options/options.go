@@ -32,7 +32,7 @@ import (
 const (
 	LogFileOutput = "file"
 	LogStdOutput  = "stdout"
-	//Version       = "1.13.2"
+	// Version       = "1.13.2"
 
 	ProgramName      = "CHAOS_AGENT"
 	BladeProgramName = "CHAOS_BLADE"
@@ -146,9 +146,9 @@ type TransportConfig struct {
 	Environment string
 	// Endpoint is server address with port
 	Endpoint string
-	//Timeout is the maximum amount of time a client will wait for a connect to complete
+	// Timeout is the maximum amount of time a client will wait for a connect to complete
 	Timeout time.Duration
-	//Secure is setting the socket encrypted or not
+	// Secure is setting the socket encrypted or not
 	Secure bool
 }
 
@@ -167,8 +167,8 @@ func NewOptions() {
 		Opts.Usage()
 		os.Exit(0)
 	}
-
 }
+
 func (o *Options) AddFlags() {
 	o.Flags = pflag.NewFlagSet("", pflag.ExitOnError)
 	o.Flags.Usage = func() {
@@ -254,12 +254,12 @@ func (o *Options) InitApplicationInfo(appInstance string, appGroup string) {
 	if err := tools.RecordApplicationToFile(appInstance, appGroup, true); err != nil {
 		logrus.WithError(err).Warningln("record application info to local file failed")
 	}
-
 }
 
 func (o *Options) SetUid(uid string) {
 	o.Uid = uid
 }
+
 func (o *Options) SetCid(cid string) {
 	o.Cid = cid
 }
@@ -299,6 +299,7 @@ func (o *Options) IsHostMode() bool {
 func (o *Options) GetPid() string {
 	return strconv.Itoa(os.Getpid())
 }
+
 func (o *Options) GetPrivateIp() string {
 	ifs, err := net.Interfaces()
 	if err != nil {

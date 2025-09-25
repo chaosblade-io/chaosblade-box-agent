@@ -39,12 +39,13 @@ import (
 	"k8s.io/client-go/rest"
 	k8symaml "sigs.k8s.io/yaml"
 
+	v1alpha1 "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
+	chaosClient "github.com/litmuschaos/chaos-operator/pkg/client/clientset/versioned/typed/litmuschaos/v1alpha1"
+
 	"github.com/chaosblade-io/chaos-agent/conn/asyncreport"
 	"github.com/chaosblade-io/chaos-agent/pkg/kubernetes"
 	"github.com/chaosblade-io/chaos-agent/pkg/options"
 	"github.com/chaosblade-io/chaos-agent/pkg/tools"
-	v1alpha1 "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
-	chaosClient "github.com/litmuschaos/chaos-operator/pkg/client/clientset/versioned/typed/litmuschaos/v1alpha1"
 
 	//"github.com/chaosblade-io/chaos-agent/pkg/options"
 	"github.com/chaosblade-io/chaos-agent/transport"
@@ -231,7 +232,7 @@ func (lh *LitmusChaosHandler) AsyncHandlerResultStatus(ctx context.Context, name
 
 // prepareLitmus before inject fault, need create experiment
 func (lh *LitmusChaosHandler) prepareLitmusExperiment(ctx context.Context, experimentType, experimentName, namespace string) error {
-	//var crdsDefinition  *apiextensionv1beta1.CustomResourceDefinition
+	// var crdsDefinition  *apiextensionv1beta1.CustomResourceDefinition
 	var expriment *v1alpha1.ChaosExperiment
 	litmusExperiment, err := DownloadLitmus(experimentType, experimentName, LITMUS_EXPERIMENT)
 	if err != nil {
@@ -287,10 +288,8 @@ func (lh *LitmusChaosHandler) prepareLitmusRbac(experimentType, experimentName, 
 	rolebindingYamlStr := []byte(strings.Trim(resArr[3], "\n"))
 	if role.Kind == K8sKindClusterRole {
 		return lh.createClusterRoleAndRoleBinding(roleYamlStr, rolebindingYamlStr, namespace)
-
 	}
 	return lh.createRoleAndRoleBinding(roleYamlStr, rolebindingYamlStr, namespace)
-
 }
 
 func (lh *LitmusChaosHandler) createClusterRoleAndRoleBinding(roleStr, roleBindingStr []byte, namespace string) error {
@@ -411,7 +410,6 @@ func (lh *LitmusChaosHandler) createEnginer(ctx context.Context, name, namespace
 	}
 
 	chaosEnginer := &v1alpha1.ChaosEngine{
-
 		ObjectMeta: metaV1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
@@ -421,7 +419,7 @@ func (lh *LitmusChaosHandler) createEnginer(ctx context.Context, name, namespace
 			ChaosServiceAccount: experimentName + "-sa",
 			JobCleanUpPolicy:    "delete",
 			EngineState:         "active",
-			//AnnotationCheck:     "false",
+			// AnnotationCheck:     "false",
 			Experiments: []v1alpha1.ExperimentList{
 				{
 					Name: experimentName,
@@ -470,7 +468,7 @@ func DownloadLitmus(experimentType, experimentName, objectType string) ([]byte, 
 	// create file
 	tools.IsExist(localFilePath)
 	file, err := os.Create(localFilePath)
-	os.Chmod(localFilePath, 0744)
+	os.Chmod(localFilePath, 0o744)
 	defer file.Close()
 
 	// copy url response to file

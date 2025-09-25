@@ -89,7 +89,6 @@ func (cc *ClientConnectHandler) Start() error {
 	uri := transport.TransportUriMap[transport.API_REGISTRY]
 
 	response, err := cc.transportClient.Invoke(uri, request, false)
-
 	if err != nil {
 		return err
 	}

@@ -20,9 +20,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/chaosblade-io/chaos-agent/transport"
 	"github.com/chaosblade-io/chaos-agent/web"
-	"github.com/sirupsen/logrus"
 )
 
 type ServerRequestHandler struct {

@@ -20,18 +20,22 @@ var PrepareOperation = map[string]bool{
 	"prepare": true,
 	"p":       true,
 }
+
 var CreateOperation = map[string]bool{
 	"create": true,
 	"c":      true,
 }
+
 var RevokeOperation = map[string]bool{
 	"revoke": true,
 	"r":      true,
 }
+
 var DestroyOperation = map[string]bool{
 	"destroy": true,
 	"d":       true,
 }
+
 var AsyncParamer = map[string]bool{
 	"async": true,
 	"a":     true,

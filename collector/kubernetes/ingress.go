@@ -61,7 +61,6 @@ func NewIngressCollector(trans *transport.TransportClient, k8sChannel *kubernete
 }
 
 func (collector *IngressCollector) Report() {
-
 	if collector.indexer == nil {
 		// 需要构建reflector
 		if collector.k8sChannel.ClientSet == nil {
@@ -84,7 +83,7 @@ func (collector *IngressCollector) Report() {
 
 func (collector *IngressCollector) reportNotExistResource() {
 	// old rs
-	var ingresses = make([]*IngressInfo, 0)
+	ingresses := make([]*IngressInfo, 0)
 	collector.IdentifierLock.Lock()
 	ingIdentifiers := collector.identifiers
 	logrus.Debugf("[INGRESS REPORT] ingIdentifiers len: %d", len(ingIdentifiers))
@@ -116,7 +115,7 @@ func (collector *IngressCollector) reportNotExistResource() {
 func (collector *IngressCollector) getIngressInfo() ([]*IngressInfo, error) {
 	list := collector.indexer.List()
 	logrus.Debugf("[INGRESS REPORT] get ingress from lister, size: %d", len(list))
-	var ingresses = make([]*IngressInfo, 0)
+	ingresses := make([]*IngressInfo, 0)
 	for _, i := range list {
 		ing := i.(*v1beta1.Ingress)
 		ingressInfo := &IngressInfo{
@@ -242,7 +241,7 @@ type IngressRule struct {
 }
 
 type IngressRuleValue struct {
-	//TODO:
+	// TODO:
 	// 1. Consider renaming this resource and the associated rules so they
 	// aren't tied to Ingress. They can be used to route intra-cluster traffic.
 	// 2. Consider adding fields for ingress-type specific global options

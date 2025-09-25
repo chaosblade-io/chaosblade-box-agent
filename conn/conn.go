@@ -71,5 +71,4 @@ func (c *Conn) Start() {
 			}
 		}
 	}()
-
 }

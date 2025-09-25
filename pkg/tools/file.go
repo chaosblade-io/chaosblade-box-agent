@@ -66,14 +66,14 @@ func DeCompressTgz(tarFile, destPath string) error {
 }
 
 func createFile(fileName string, reader *tar.Reader) error {
-	err := os.MkdirAll(string([]rune(fileName)[0:strings.LastIndex(fileName, "/")]), 0755)
+	err := os.MkdirAll(string([]rune(fileName)[0:strings.LastIndex(fileName, "/")]), 0o755)
 	if err != nil {
 		return err
 	}
 	if fileName[len(fileName)-1:] == "/" {
 		return nil
 	}
-	fw, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0755)
+	fw, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0o755)
 	if err != nil {
 		return err
 	}

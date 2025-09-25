@@ -287,7 +287,7 @@ func (cache *Cache) saveChartConfig(ch *chart.Chart) (*ocispec.Descriptor, bool,
 // saveChartContentLayer stores the chart as tarball blob and returns a descriptor
 func (cache *Cache) saveChartContentLayer(ch *chart.Chart) (*ocispec.Descriptor, bool, error) {
 	destDir := filepath.Join(cache.rootDir, ".build")
-	os.MkdirAll(destDir, 0755)
+	os.MkdirAll(destDir, 0o755)
 	tmpFile, err := chartutil.Save(ch, destDir)
 	defer os.Remove(tmpFile)
 	if err != nil {
