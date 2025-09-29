@@ -12,13 +12,14 @@ RUN curl -L https://get.helm.sh/helm-v3.6.0-linux-amd64.tar.gz | tar xz \
 
 ENV HELM_EXPERIMENTAL_OCI 1
 
+RUN mkdir -p /opt
 WORKDIR /opt
 WORKDIR /root/chaos
 
 COPY ./agent /root/chaos
-ARG BLADE_VERSION=0.0.1
+ARG BLADE_VERSION=1.7.5
 
-RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/${BLADE_VERSION}/chaosblade-${BLADE_VERSION}-linux-amd64.tar.gz | tar xz \
-    && mv chaosblade-${BLADE_VERSION} /opt/chaosblade
+RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/1.7.5/chaosblade-1.7.5-linux_amd64.tar.gz | tar xz \
+    && mv chaosblade-1.7.5-linux_amd64 /opt/chaosblade
 
 ENTRYPOINT ["/root/chaos/agent"]

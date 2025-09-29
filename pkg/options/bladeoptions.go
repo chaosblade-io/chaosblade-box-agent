@@ -74,15 +74,26 @@ func GetChaosBladeVersion() (string, error) {
 		return "", errors.New("cannot get blade version")
 	}
 
-	versionInfo := versionInfos[0]
-	hasPrefix := strings.HasPrefix(versionInfo, "version")
-	if !hasPrefix {
-		return "", fmt.Errorf("cannot get version info from first line. %s", result)
+	// 查找包含版本信息的行
+	var versionLine string
+	for _, line := range versionInfos {
+		// 检查是否以 "Version:" 开头（忽略大小写）
+		if strings.HasPrefix(strings.ToLower(line), "version:") {
+			versionLine = line
+			break
+		}
 	}
-	versionArr := strings.Split(versionInfo, ":")
+	
+	if versionLine == "" {
+		return "", fmt.Errorf("cannot get version info from output. %s", result)
+	}
+	
+	// 分割版本行信息
+	versionArr := strings.SplitN(versionLine, ":", 2)
 	if len(versionArr) != 2 {
-		return "", fmt.Errorf("parse version info error. %s", versionInfo)
+		return "", fmt.Errorf("parse version info error. %s", versionLine)
 	}
+	
 	version := strings.TrimSpace(versionArr[1])
 	logrus.Infof("ChaosBlade version is %s", version)
 	return version, nil

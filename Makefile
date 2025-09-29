@@ -1,6 +1,6 @@
 .PHONE: build clean
-export AGENT_VERSION = 1.0.3
-export BLADE_VERSION = 1.7.2
+export AGENT_VERSION = 1.1.0
+export BLADE_VERSION = 1.7.5
 
 BLADE_SRC_ROOT=$(shell pwd)
 
@@ -34,8 +34,8 @@ build_binary: cmd/chaos_agent.go
 	$(GO) build $(GO_FLAGS) -o $(BUILD_BINARY_PATH)/agent $<
 
 build_linux:
-	docker build -f $(BUILD_BINARY_MUSL_PATH)/Dockerfile -t agent-build-musl:latest $(BUILD_BINARY_MUSL_PATH)
-	docker run --rm \
+	podman buildx build --platform linux/amd64 -f $(BUILD_BINARY_MUSL_PATH)/Dockerfile -t agent-build-musl:latest $(BUILD_BINARY_MUSL_PATH)
+	podman run --platform linux/amd64 --rm \
     		-v $(shell echo -n ${GOPATH}):/go \
     		-w /chaos-agent \
     		-v $(BLADE_SRC_ROOT):/chaos-agent \
@@ -54,7 +54,7 @@ build_chart:
 build_image:
 	rm -rf $(BUILD_IMAGE_MUSL_PATH)/agent
 	cp $(BUILD_BINARY_PATH)/agent $(BUILD_IMAGE_MUSL_PATH)
-	docker build --pull --build-arg BLADE_VERSION=${BLADE_VERSION} -f $(BUILD_IMAGE_MUSL_PATH)/Dockerfile \
+	podman buildx build --platform linux/amd64 --pull --build-arg BLADE_VERSION=${BLADE_VERSION} -f $(BUILD_IMAGE_MUSL_PATH)/Dockerfile \
 		-t chaosbladeio/chaosblade-agent:$(AGENT_VERSION) $(BLADE_SRC_ROOT)/$(BUILD_IMAGE_MUSL_PATH)
 
 build_image_arm:
