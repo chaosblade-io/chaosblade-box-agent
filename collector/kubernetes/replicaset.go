@@ -34,7 +34,7 @@ import (
 )
 
 type ReplicaSetCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 
@@ -56,8 +56,8 @@ func NewReplicasetCollector(trans *transport.TransportClient, k8sChannel *kubern
 	collector := createK8sBaseCollector(kubernetes.NodeResource, k8sChannel, trans, uri)
 
 	return &ReplicaSetCollector{
-		collector,
-		opts,
+		K8sBaseCollector: collector,
+		opts:             opts,
 	}
 }
 

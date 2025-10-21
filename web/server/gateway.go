@@ -33,9 +33,9 @@ func NewGatewayServer() web.APiServer {
 	}
 }
 
-func (this GatewayServer) RegisterHandler(handlerName string, handler web.ServerHandler) error {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+func (s *GatewayServer) RegisterHandler(handlerName string, handler web.ServerHandler) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
 	if handlerName == "" {
 		return errors.New("handlerName can not be blank")

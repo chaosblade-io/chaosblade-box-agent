@@ -56,7 +56,7 @@ type VirtualNodeInfo struct {
 }
 
 type VirtualNodeCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	nodeIndex cache.Indexer
 	podIndex  map[string]cache.Indexer
 	opts      metav1.ListOptions

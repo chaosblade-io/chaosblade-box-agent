@@ -46,7 +46,7 @@ type DeploymentInfo struct {
 }
 
 type DeploymentCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 

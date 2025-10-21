@@ -43,7 +43,7 @@ type NodeInfo struct {
 }
 
 type NodeCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 
@@ -55,8 +55,8 @@ func NewNodeCollector(trans *transport.TransportClient, k8sChannel *kubernetes.C
 	collector := createK8sBaseCollector(kubernetes.NodeResource, k8sChannel, trans, uri)
 
 	return &NodeCollector{
-		collector,
-		opts,
+		K8sBaseCollector: collector,
+		opts:             opts,
 	}
 }
 

@@ -46,7 +46,7 @@ type ServiceInfo struct {
 }
 
 type ServiceCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	namespaceCollector *NamespaceCollector
 	SelectorLock       sync.Mutex
 	opts               metav1.ListOptions

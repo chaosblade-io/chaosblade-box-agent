@@ -47,7 +47,7 @@ type DaemonsetInfo struct {
 }
 
 type DaemonsetCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 
