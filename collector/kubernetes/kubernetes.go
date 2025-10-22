@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,8 @@ type K8sBaseCollector struct {
 
 var LocalNodeName string
 
-func createK8sBaseCollector(resourceName string, k8sChannel *kubernetes.Channel, transport *transport.TransportClient, uri transport.Uri) K8sBaseCollector {
-	return K8sBaseCollector{
+func createK8sBaseCollector(resourceName string, k8sChannel *kubernetes.Channel, transport *transport.TransportClient, uri transport.Uri) *K8sBaseCollector {
+	return &K8sBaseCollector{
 		resourceName:      resourceName,
 		k8sChannel:        k8sChannel,
 		transport:         transport,

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import (
 	"k8s.io/client-go/rest"
 	k8symaml "sigs.k8s.io/yaml"
 
-	v1alpha1 "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
+	"github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
 	chaosClient "github.com/litmuschaos/chaos-operator/pkg/client/clientset/versioned/typed/litmuschaos/v1alpha1"
 
 	"github.com/chaosblade-io/chaos-agent/conn/asyncreport"
@@ -457,10 +457,14 @@ func DownloadLitmus(experimentType, experimentName, objectType string) ([]byte, 
 	// eg: https://hub.litmuschaos.io/api/chaos/1.13.5?file=charts/generic/pod-delete/experiment.yaml
 	experimentUrl := fmt.Sprintf("https://hub.litmuschaos.io/api/chaos/%s?file=charts/%s/%s/%s.yaml", version, experimentType, experimentName, objectType)
 	resp, err := http.Get(experimentUrl)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		if resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("download `%s` failed! response code: %d", experimentUrl, resp.StatusCode)
 	}

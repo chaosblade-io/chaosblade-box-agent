@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ func NewGatewayServer() web.APiServer {
 	}
 }
 
-func (this GatewayServer) RegisterHandler(handlerName string, handler web.ServerHandler) error {
-	this.mutex.Lock()
-	defer this.mutex.Unlock()
+func (s *GatewayServer) RegisterHandler(handlerName string, handler web.ServerHandler) error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
 	if handlerName == "" {
 		return errors.New("handlerName can not be blank")

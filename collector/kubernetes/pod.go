@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import (
 )
 
 type PodCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	serviceCollector *ServiceCollector
 
 	opts metav1.ListOptions
@@ -51,9 +51,9 @@ func NewPodCollector(trans *transport.TransportClient, k8sChannel *kubernetes.Ch
 	}
 	collector := createK8sBaseCollector(kubernetes.PodResource, k8sChannel, trans, uri)
 	return &PodCollector{
-		collector,
-		serviceCollector,
-		opts,
+		K8sBaseCollector: collector,
+		serviceCollector: serviceCollector,
+		opts:             opts,
 	}
 }
 

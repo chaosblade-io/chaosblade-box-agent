@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import (
 )
 
 type ReplicaSetCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 
@@ -56,8 +56,8 @@ func NewReplicasetCollector(trans *transport.TransportClient, k8sChannel *kubern
 	collector := createK8sBaseCollector(kubernetes.NodeResource, k8sChannel, trans, uri)
 
 	return &ReplicaSetCollector{
-		collector,
-		opts,
+		K8sBaseCollector: collector,
+		opts:             opts,
 	}
 }
 

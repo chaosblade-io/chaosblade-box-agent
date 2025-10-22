@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ type VirtualNodeInfo struct {
 }
 
 type VirtualNodeCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	nodeIndex cache.Indexer
 	podIndex  map[string]cache.Indexer
 	opts      metav1.ListOptions
