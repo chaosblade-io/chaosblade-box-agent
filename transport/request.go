@@ -49,7 +49,9 @@ func NewRequest() *Request {
 	}
 	request.AddHeader(FromHeader, Client)
 	request.AddHeader(Pid, options.Opts.Pid)
-	request.AddHeader(Uid, options.Opts.Uid)
+	if options.Opts.Uid != "" {
+		request.AddHeader(Uid, options.Opts.Uid)
+	}
 	if options.Opts.Cid != "" {
 		request.AddHeader(Cid, options.Opts.Cid)
 	}
