@@ -58,6 +58,64 @@ var CtlPathFunc = func() string {
 	return ""
 }
 
+// parseVersionFromOutput 从版本输出中解析版本号
+// 支持两种格式：
+// 1. Version:     1.8.0 (第一种格式)
+// 2. version: 1.7.3 (第二种格式)
+func parseVersionFromOutput(output string) (string, error) {
+	trimmedOutput := strings.TrimSpace(output)
+	if trimmedOutput == "" {
+		return "", errors.New("cannot get blade version")
+	}
+
+	versionInfos := strings.Split(trimmedOutput, "\n")
+	if len(versionInfos) == 0 {
+		return "", errors.New("cannot get blade version")
+	}
+
+	// 尝试解析第一种格式：Version:     1.8.0
+	for _, line := range versionInfos {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "Version:") {
+			versionArr := strings.Split(line, ":")
+			if len(versionArr) == 2 {
+				version := strings.TrimSpace(versionArr[1])
+				// 如果版本号为空，返回错误
+				if version == "" {
+					continue
+				}
+				// 只取第一个单词（版本号），忽略后面的额外文本
+				versionParts := strings.Fields(version)
+				if len(versionParts) > 0 {
+					return versionParts[0], nil
+				}
+			}
+		}
+	}
+
+	// 尝试解析第二种格式：version: 1.7.3
+	for _, line := range versionInfos {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(strings.ToLower(line), "version:") {
+			versionArr := strings.Split(line, ":")
+			if len(versionArr) == 2 {
+				version := strings.TrimSpace(versionArr[1])
+				// 如果版本号为空，返回错误
+				if version == "" {
+					continue
+				}
+				// 只取第一个单词（版本号），忽略后面的额外文本
+				versionParts := strings.Fields(version)
+				if len(versionParts) > 0 {
+					return versionParts[0], nil
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("cannot parse version info from output. %s", output)
+}
+
 // GetChaosBladeVersion
 func GetChaosBladeVersion() (string, error) {
 	if !tools.IsExist(BladeBinPath) {
@@ -69,21 +127,11 @@ func GetChaosBladeVersion() (string, error) {
 		return "", errors.New(errMsg)
 	}
 
-	versionInfos := strings.Split(strings.TrimSpace(result), "\n")
-	if len(versionInfos) == 0 {
-		return "", errors.New("cannot get blade version")
+	version, err := parseVersionFromOutput(result)
+	if err != nil {
+		return "", err
 	}
 
-	versionInfo := versionInfos[0]
-	hasPrefix := strings.HasPrefix(versionInfo, "version")
-	if !hasPrefix {
-		return "", fmt.Errorf("cannot get version info from first line. %s", result)
-	}
-	versionArr := strings.Split(versionInfo, ":")
-	if len(versionArr) != 2 {
-		return "", fmt.Errorf("parse version info error. %s", versionInfo)
-	}
-	version := strings.TrimSpace(versionArr[1])
 	logrus.Infof("ChaosBlade version is %s", version)
 	return version, nil
 }

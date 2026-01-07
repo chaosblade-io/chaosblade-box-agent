@@ -30,9 +30,9 @@ RUN wget http://www.musl-libc.org/releases/musl-1.1.21.tar.gz \
     && rm -rf musl*
 
 # install go
-RUN wget https://dl.google.com/go/go1.13.10.linux-arm64.tar.gz \
-    && tar -C /usr/local -xzf go1.13.10.linux-arm64.tar.gz \
-    && rm -rf go1.13.10.linux-arm64.tar.gz
+RUN wget https://dl.google.com/go/go1.25.5.linux-arm64.tar.gz \
+    && tar -C /usr/local -xzf go1.25.5.linux-arm64.tar.gz \
+    && rm -rf go1.25.5.linux-arm64.tar.gz
 
 ENV CC /usr/local/musl/bin/musl-gcc
 ENV GOOS linux

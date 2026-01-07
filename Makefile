@@ -13,8 +13,8 @@
 # limitations under the License.
 
 .PHONE: build clean
-export AGENT_VERSION = 1.0.3
-export BLADE_VERSION = 1.7.2
+export AGENT_VERSION = 1.1.0
+export BLADE_VERSION = 1.8.0
 
 BLADE_SRC_ROOT=$(shell pwd)
 
@@ -92,12 +92,22 @@ verify:
 .PHONY: license-check
 license-check:
 	@echo "Checking license headers..."
-	docker run -it --rm -v $(shell pwd):/github/workspace ghcr.io/korandoru/hawkeye check
+	@if command -v hawkeye > /dev/null 2>&1; then \
+		hawkeye check; \
+	else \
+		echo "Using Docker to run hawkeye..."; \
+		docker run -it --rm -v $(shell pwd):/github/workspace ghcr.io/korandoru/hawkeye check; \
+	fi
 
 .PHONY: license-format
 license-format:
 	@echo "Formatting license headers..."
-	docker run -it --rm -v $(shell pwd):/github/workspace ghcr.io/korandoru/hawkeye format
+	@if command -v hawkeye > /dev/null 2>&1; then \
+		hawkeye format; \
+	else \
+		echo "Using Docker to run hawkeye..."; \
+		docker run -it --rm -v $(shell pwd):/github/workspace ghcr.io/korandoru/hawkeye format; \
+	fi
 
 .PHONY: help
 help:
