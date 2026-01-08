@@ -33,6 +33,6 @@ COPY ./agent /root/chaos
 ARG BLADE_VERSION=0.0.1
 
 RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/${BLADE_VERSION}/chaosblade-${BLADE_VERSION}-linux_amd64.tar.gz | tar xz \
-    && mv chaosblade-${BLADE_VERSION} /opt/chaosblade
+    && mv chaosblade-${BLADE_VERSION}-linux_amd64 /opt/chaosblade
 
 ENTRYPOINT ["/root/chaos/agent"]

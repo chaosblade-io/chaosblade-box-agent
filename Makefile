@@ -96,10 +96,10 @@ build_arm64:
 	fi
 
 build_chart_amd64:
-	helm package $(BUILD_HELM_PATH_AMD64)
+	helm package $(BUILD_HELM_PATH_AMD64) --destination build/helm3/
 
 build_chart_arm64:
-	helm package $(BUILD_HELM_PATH_ARM64)
+	helm package $(BUILD_HELM_PATH_ARM64) --destination build/helm3/
 
 build_image_amd64:
 	rm -rf $(BUILD_IMAGE_MUSL_PATH)/agent
