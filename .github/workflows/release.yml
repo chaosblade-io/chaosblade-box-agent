@@ -1,0 +1,438 @@
+# Copyright 2025 The ChaosBlade Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on tags starting with 'v', e.g., v1.1.0
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.1.0)'
+        required: true
+        type: string
+      branch:
+        description: 'Code branch to build and release from (e.g., main, master, develop)'
+        required: false
+        type: string
+        default: 'main'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+            binary_path: build/binary_musl
+            image_path: build/image_musl
+            image_tag_suffix: ""
+            make_build_target: build_amd64
+            make_image_target: build_image_amd64
+          - arch: arm64
+            platform: linux/arm64
+            binary_path: build/binary_arm
+            image_path: build/image_arm
+            image_tag_suffix: "-arm64"
+            make_build_target: build_arm64
+            make_image_target: build_image_arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
+      
+      - name: Display build information
+        run: |
+          echo "Build Information:"
+          echo "  Event: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "  Version: ${{ github.event.inputs.version }}"
+            echo "  Branch: ${{ github.event.inputs.branch }}"
+          else
+            echo "  Tag: ${{ github.ref }}"
+          fi
+          echo "  Repository: ${{ github.repository }}"
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Extract version from tag
+        id: extract_version
+        if: github.event_name == 'push'
+        run: |
+          # Remove 'refs/tags/' prefix and optional 'v' prefix
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Set version from input
+        id: set_version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          # Remove 'v' prefix if present
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Using version: $VERSION"
+          echo "Using branch: ${{ github.event.inputs.branch }}"
+
+      - name: Set version variable
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            VERSION="${{ steps.extract_version.outputs.version }}"
+          else
+            VERSION="${{ steps.set_version.outputs.version }}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "AGENT_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Final version: $VERSION"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up GOPATH
+        run: |
+          # Ensure GOPATH is set (default is $HOME/go)
+          mkdir -p $HOME/go
+          echo "GOPATH=$HOME/go" >> $GITHUB_ENV
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '3.12.0'
+
+      - name: Build binary for ${{ matrix.arch }}
+        env:
+          AGENT_VERSION: ${{ env.VERSION }}
+          BLADE_VERSION: 1.8.0
+        run: |
+          make ${{ matrix.make_build_target }}
+
+      - name: Package for ${{ matrix.arch }}
+        env:
+          AGENT_VERSION: ${{ env.VERSION }}
+          BLADE_VERSION: 1.8.0
+          ARCH: ${{ matrix.arch }}
+        run: |
+          # Use make package to create the complete package
+          make package ARCH=${{ matrix.arch }}
+          # Verify package was created
+          PACKAGE_FILE="build/chaosagent-${AGENT_VERSION}-linux_${{ matrix.arch }}.tar.gz"
+          if [ ! -f "${PACKAGE_FILE}" ]; then
+            echo "❌ Error: Package file not found: ${PACKAGE_FILE}"
+            exit 1
+          fi
+          echo "✅ Package created for ${{ matrix.arch }}: ${PACKAGE_FILE}"
+          ls -lh "${PACKAGE_FILE}"
+
+      - name: Build Docker image for ${{ matrix.arch }}
+        env:
+          AGENT_VERSION: ${{ env.VERSION }}
+          BLADE_VERSION: 1.8.0
+        run: |
+          # Verify binary exists before building image
+          if [ ! -f "build/agent" ]; then
+            echo "Error: Binary file not found at build/agent"
+            exit 1
+          fi
+          make ${{ matrix.make_image_target }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ env.VERSION }}${{ matrix.image_tag_suffix }}
+            type=raw,value=latest${{ matrix.image_tag_suffix }}
+
+      - name: Tag and push Docker image for ${{ matrix.arch }}
+        run: |
+          IMAGE_NAME="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          VERSION="${{ env.VERSION }}"
+          TAG_SUFFIX="${{ matrix.image_tag_suffix }}"
+          
+          if [ "${{ matrix.arch }}" == "amd64" ]; then
+            SOURCE_IMAGE="chaosbladeio/chaosblade-agent:${VERSION}"
+          else
+            SOURCE_IMAGE="chaosbladeio/chaosblade-agent-arm64:${VERSION}"
+          fi
+          
+          # Tag and push version tag
+          docker tag ${SOURCE_IMAGE} ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX}
+          docker push ${IMAGE_NAME}:${VERSION}${TAG_SUFFIX}
+          
+          # Tag and push latest tag
+          docker tag ${SOURCE_IMAGE} ${IMAGE_NAME}:latest${TAG_SUFFIX}
+          docker push ${IMAGE_NAME}:latest${TAG_SUFFIX}
+
+      - name: Build Helm chart for ${{ matrix.arch }}
+        env:
+          AGENT_VERSION: ${{ env.VERSION }}
+        run: |
+          if [ "${{ matrix.arch }}" == "amd64" ]; then
+            make build_chart_amd64
+          else
+            make build_chart_arm64
+          fi
+          # Helm package creates files in the chart directory, find the generated chart
+          CHART_FILE=$(find build/helm3 -name "chaosblade-box-agent-${AGENT_VERSION}.tgz" -type f | head -1)
+          if [ -z "${CHART_FILE}" ]; then
+            echo "⚠️  Warning: Helm chart file not found for version ${AGENT_VERSION}"
+            echo "Available files in build/helm3/:"
+            find build/helm3 -name "*.tgz" -type f || echo "No .tgz files found"
+          else
+            echo "✅ Helm chart built for ${{ matrix.arch }}: ${CHART_FILE}"
+            ls -lh "${CHART_FILE}"
+          fi
+
+      - name: Upload package artifact for ${{ matrix.arch }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.arch }}
+          path: build/chaosagent-${{ env.VERSION }}-linux_${{ matrix.arch }}.tar.gz
+          retention-days: 30
+
+      - name: Upload helm chart artifact for ${{ matrix.arch }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-chart-${{ matrix.arch }}
+          path: build/helm3/**/*.tgz
+          if-no-files-found: warn
+          retention-days: 30
+
+  create-release:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: extract_version
+        if: github.event_name == 'push'
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set version from input
+        id: set_version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          # Remove 'v' prefix if present
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set version variable
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            VERSION="${{ steps.extract_version.outputs.version }}"
+          else
+            VERSION="${{ steps.set_version.outputs.version }}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Release version: $VERSION"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release packages
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          # Create release directory
+          mkdir -p release-assets
+          
+          PACKAGE_AMD64="chaosagent-${VERSION}-linux_amd64.tar.gz"
+          PACKAGE_ARM64="chaosagent-${VERSION}-linux_arm64.tar.gz"
+          
+          # Copy amd64 package
+          if [ -f "artifacts/package-amd64/${PACKAGE_AMD64}" ]; then
+            cp artifacts/package-amd64/${PACKAGE_AMD64} release-assets/
+            echo "✅ Copied amd64 package: ${PACKAGE_AMD64}"
+          else
+            echo "❌ amd64 package not found: artifacts/package-amd64/${PACKAGE_AMD64}"
+            ls -la artifacts/package-amd64/ || echo "package-amd64 directory not found"
+          fi
+          
+          # Copy arm64 package
+          if [ -f "artifacts/package-arm64/${PACKAGE_ARM64}" ]; then
+            cp artifacts/package-arm64/${PACKAGE_ARM64} release-assets/
+            echo "✅ Copied arm64 package: ${PACKAGE_ARM64}"
+          else
+            echo "❌ arm64 package not found: artifacts/package-arm64/${PACKAGE_ARM64}"
+            ls -la artifacts/package-arm64/ || echo "package-arm64 directory not found"
+          fi
+          
+          # Copy helm charts
+          if [ -d "artifacts/helm-chart-amd64" ]; then
+            cp artifacts/helm-chart-amd64/*.tgz release-assets/ 2>/dev/null || true
+            echo "✅ Copied amd64 helm chart"
+          fi
+          
+          if [ -d "artifacts/helm-chart-arm64" ]; then
+            cp artifacts/helm-chart-arm64/*.tgz release-assets/ 2>/dev/null || true
+            echo "✅ Copied arm64 helm chart"
+          fi
+          
+          # Display release assets
+          echo "Release assets:"
+          ls -lh release-assets/
+          
+          # Generate checksums for all tar.gz files
+          cd release-assets
+          if [ -n "$(ls -A *.tar.gz 2>/dev/null)" ]; then
+            sha256sum *.tar.gz > checksums.txt
+            echo "Generated checksums:"
+            cat checksums.txt
+          else
+            echo "⚠️  No packages found to generate checksums"
+          fi
+          cd ..
+
+      - name: Setup OSSUTIL environment
+        uses: yizhoumo/setup-ossutil@v1.1.3
+        env:
+          BINARY_TAG: ${{ env.VERSION }}
+        with:
+          endpoint: ${{ secrets.OSS_ENDPOINT }}
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          ossutil-version: '1.7.14'
+
+      - name: Upload packages to OSS
+        env:
+          BINARY_TAG: ${{ env.VERSION }}
+          VERSION: ${{ env.VERSION }}
+        run: |
+          echo "Uploading ChaosAgent packages to OSS..."
+          
+          PACKAGE_AMD64="chaosagent-${VERSION}-linux_amd64.tar.gz"
+          PACKAGE_ARM64="chaosagent-${VERSION}-linux_arm64.tar.gz"
+          
+          # Upload amd64 package
+          if [ -f "release-assets/${PACKAGE_AMD64}" ]; then
+            echo "Uploading amd64 package..."
+            ossutil cp -f "release-assets/${PACKAGE_AMD64}" "oss://chaosblade/platform/release/${BINARY_TAG}/${PACKAGE_AMD64}"
+            echo "✅ amd64 package uploaded successfully"
+            echo "OSS URL: https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${BINARY_TAG}/${PACKAGE_AMD64}"
+          else
+            echo "❌ amd64 package not found: release-assets/${PACKAGE_AMD64}"
+          fi
+          
+          # Upload arm64 package
+          if [ -f "release-assets/${PACKAGE_ARM64}" ]; then
+            echo "Uploading arm64 package..."
+            ossutil cp -f "release-assets/${PACKAGE_ARM64}" "oss://chaosblade/platform/release/${BINARY_TAG}/${PACKAGE_ARM64}"
+            echo "✅ arm64 package uploaded successfully"
+            echo "OSS URL: https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${BINARY_TAG}/${PACKAGE_ARM64}"
+          else
+            echo "❌ arm64 package not found: release-assets/${PACKAGE_ARM64}"
+          fi
+          
+          # Upload checksums file
+          if [ -f "release-assets/checksums.txt" ]; then
+            echo "Uploading checksums file..."
+            ossutil cp -f "release-assets/checksums.txt" "oss://chaosblade/platform/release/${BINARY_TAG}/checksums.txt"
+            echo "✅ Checksums file uploaded successfully"
+            echo "OSS URL: https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${BINARY_TAG}/checksums.txt"
+          else
+            echo "⚠️  Checksums file not found"
+          fi
+          
+          echo "All packages uploaded to OSS successfully"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          body: |
+            ## Release v${{ env.VERSION }}
+
+            ### Docker Images
+            - **linux/amd64**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}`
+            - **linux/arm64**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-arm64`
+
+            ### Binary Packages
+            - **linux/amd64**: `chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz` - For 64-bit Linux systems
+            - **linux/arm64**: `chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz` - For ARM64 Linux systems
+
+            ### Helm Charts
+            See attached Helm chart packages for both architectures.
+
+            ### OSS Download Links
+            Alternative download links from Alibaba Cloud OSS:
+            - **linux/amd64**: [chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz)
+            - **linux/arm64**: [chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz)
+            - [checksums.txt](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/checksums.txt) - SHA256 checksums
+
+            ### Installation
+
+            **From Binary Package:**
+            ```bash
+            # Download and extract
+            wget https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz
+            tar -xzf chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz
+            ```
+
+            **From Helm Chart:**
+            ```bash
+            # Install using Helm
+            helm install chaos-agent ./chaos-agent-${{ env.VERSION }}.tgz --namespace chaosblade
+            ```
+          files: |
+            release-assets/*.tar.gz
+            release-assets/checksums.txt
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM alpine:3.8
+FROM alpine:3.22
 LABEL maintainer="Mingxia Cai"
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
@@ -32,7 +32,7 @@ WORKDIR /root/chaos
 COPY ./agent /root/chaos
 ARG BLADE_VERSION=0.0.1
 
-RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/${BLADE_VERSION}/chaosblade-${BLADE_VERSION}-linux-amd64.tar.gz | tar xz \
+RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/${BLADE_VERSION}/chaosblade-${BLADE_VERSION}-linux_amd64.tar.gz | tar xz \
     && mv chaosblade-${BLADE_VERSION} /opt/chaosblade
 
 ENTRYPOINT ["/root/chaos/agent"]

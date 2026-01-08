@@ -304,23 +304,19 @@ func parseResult(result string) *transport.Response {
 	var response transport.Response
 	err := json.Unmarshal([]byte(result), &response)
 	if err != nil {
-		excludeInfo := "getcwd: cannot access parent directories"
-		errIndex := strings.Index(result, excludeInfo)
-		if errIndex < 0 {
+		// 如果直接解析失败，尝试查找 JSON 数据的开始位置
+		// 这可以处理各种前缀日志，如 "getcwd: cannot access parent directories" 或 "Throttling request" 等
+		bladeIndex := strings.Index(result, "{")
+		if bladeIndex < 0 {
 			return transport.ReturnFail(transport.ServerError,
-				fmt.Sprintf("execute success, but unmarshal result err, result: %s", result))
-		} else {
-			bladeIndex := strings.Index(result, "{")
-			if bladeIndex < 0 {
-				return transport.ReturnFail(transport.ServerError,
-					fmt.Sprintf("execute success, but parse result err, result: %s", result))
-			}
-			result = result[bladeIndex:]
-			err := json.Unmarshal([]byte(result), &response)
-			if err != nil {
-				return transport.ReturnFail(transport.ServerError,
-					fmt.Sprintf("execute success, but unmarshal result err with parsing, result: %s", result))
-			}
+				fmt.Sprintf("execute success, but parse result err, result: %s", result))
+		}
+		// 从第一个 '{' 开始提取 JSON 部分
+		jsonStr := result[bladeIndex:]
+		err := json.Unmarshal([]byte(jsonStr), &response)
+		if err != nil {
+			return transport.ReturnFail(transport.ServerError,
+				fmt.Sprintf("execute success, but unmarshal result err with parsing, result: %s", result))
 		}
 	}
 	return &response

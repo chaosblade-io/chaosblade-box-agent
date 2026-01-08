@@ -32,7 +32,7 @@ WORKDIR /root/chaos
 COPY ./agent /root/chaos
 ARG BLADE_VERSION=0.0.1
 
-RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/${BLADE_VERSION}/chaosblade-${BLADE_VERSION}-linux-arm64.tar.gz | tar xz \
+RUN curl -L https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/${BLADE_VERSION}/chaosblade-${BLADE_VERSION}-linux_arm64.tar.gz | tar xz \
     && mv chaosblade-${BLADE_VERSION} /opt/chaosblade
 
 ENTRYPOINT ["/root/chaos/agent"]
