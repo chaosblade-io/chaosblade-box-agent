@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-.PHONE: build clean
+.PHONY: build clean
 export AGENT_VERSION = 1.1.0
 export BLADE_VERSION = 1.8.0
 
