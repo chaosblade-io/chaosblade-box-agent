@@ -24,11 +24,11 @@ on:
         description: 'Version to release (e.g., 1.1.0)'
         required: true
         type: string
-      branch:
-        description: 'Code branch to build and release from (e.g., main, master, develop)'
+      draft:
+        description: 'Create as draft release'
         required: false
-        type: string
-        default: 'main'
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
@@ -36,11 +36,12 @@ env:
 
 jobs:
   build-and-publish:
-    runs-on: ubuntu-latest
+    name: Build - ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: write
       packages: write
-    
+
     strategy:
       matrix:
         include:
@@ -51,6 +52,8 @@ jobs:
             image_tag_suffix: ""
             make_build_target: build_amd64
             make_image_target: build_image_amd64
+            make_chart_target: build_chart_amd64
+            runner: ubuntu-latest
           - arch: arm64
             platform: linux/arm64
             binary_path: build/binary_arm
@@ -58,21 +61,23 @@ jobs:
             image_tag_suffix: "-arm64"
             make_build_target: build_arm64
             make_image_target: build_image_arm64
+            make_chart_target: build_chart_arm64
+            runner: ubuntu-24.04-arm
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
           fetch-depth: 0
       
       - name: Display build information
         run: |
           echo "Build Information:"
           echo "  Event: ${{ github.event_name }}"
+          echo "  Architecture: ${{ matrix.arch }}"
+          echo "  Runner: ${{ matrix.runner }}"
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "  Version: ${{ github.event.inputs.version }}"
-            echo "  Branch: ${{ github.event.inputs.branch }}"
           else
             echo "  Tag: ${{ github.ref }}"
           fi
@@ -103,7 +108,6 @@ jobs:
           VERSION=${VERSION#v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Using version: $VERSION"
-          echo "Using branch: ${{ github.event.inputs.branch }}"
 
       - name: Set version variable
         run: |
@@ -206,17 +210,20 @@ jobs:
         env:
           AGENT_VERSION: ${{ env.VERSION }}
         run: |
-          if [ "${{ matrix.arch }}" == "amd64" ]; then
-            make build_chart_amd64
-          else
-            make build_chart_arm64
+          make ${{ matrix.make_chart_target }}
+          # Helm package creates files in build/helm3/ directory, find the generated chart
+          # First try to find in build/helm3/, then fallback to current directory
+          CHART_FILE=$(find build/helm3 -name "chaosblade-box-agent-${AGENT_VERSION}.tgz" -type f 2>/dev/null | head -1)
+          if [ -z "${CHART_FILE}" ]; then
+            # Fallback: search in current directory
+            CHART_FILE=$(find . -maxdepth 1 -name "chaosblade-box-agent-${AGENT_VERSION}.tgz" -type f 2>/dev/null | head -1)
           fi
-          # Helm package creates files in the chart directory, find the generated chart
-          CHART_FILE=$(find build/helm3 -name "chaosblade-box-agent-${AGENT_VERSION}.tgz" -type f | head -1)
           if [ -z "${CHART_FILE}" ]; then
             echo "⚠️  Warning: Helm chart file not found for version ${AGENT_VERSION}"
             echo "Available files in build/helm3/:"
-            find build/helm3 -name "*.tgz" -type f || echo "No .tgz files found"
+            find build/helm3 -name "*.tgz" -type f 2>/dev/null || echo "No .tgz files found in build/helm3/"
+            echo "Available files in current directory:"
+            find . -maxdepth 1 -name "*.tgz" -type f 2>/dev/null || echo "No .tgz files found in current directory"
           else
             echo "✅ Helm chart built for ${{ matrix.arch }}: ${CHART_FILE}"
             ls -lh "${CHART_FILE}"
@@ -248,7 +255,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
           fetch-depth: 0
 
       - name: Extract version from tag
@@ -277,6 +283,25 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Release version: $VERSION"
+
+      - name: Set draft variable
+        id: set_draft
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            DRAFT_INPUT="${{ github.event.inputs.draft }}"
+          else
+            # For push events (tag push), default to false (not a draft)
+            DRAFT_INPUT="false"
+          fi
+          # Convert to boolean value (GitHub Actions boolean inputs are strings)
+          if [ "$DRAFT_INPUT" == "true" ] || [ "$DRAFT_INPUT" == "True" ] || [ "$DRAFT_INPUT" == "1" ]; then
+            DRAFT="true"
+          else
+            DRAFT="false"
+          fi
+          echo "draft=$DRAFT" >> $GITHUB_OUTPUT
+          echo "DRAFT=$DRAFT" >> $GITHUB_ENV
+          echo "Draft release: $DRAFT"
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -311,15 +336,30 @@ jobs:
             ls -la artifacts/package-arm64/ || echo "package-arm64 directory not found"
           fi
           
-          # Copy helm charts
+          # Copy helm charts and rename with architecture suffix
+          HELM_CHART_BASE="chaosblade-box-agent-${VERSION}"
           if [ -d "artifacts/helm-chart-amd64" ]; then
-            cp artifacts/helm-chart-amd64/*.tgz release-assets/ 2>/dev/null || true
-            echo "✅ Copied amd64 helm chart"
+            HELM_CHART_AMD64="${HELM_CHART_BASE}-helm_amd64.tgz"
+            # Find the original helm chart file
+            ORIGINAL_CHART=$(find artifacts/helm-chart-amd64 -name "*.tgz" -type f | head -1)
+            if [ -n "${ORIGINAL_CHART}" ]; then
+              cp "${ORIGINAL_CHART}" "release-assets/${HELM_CHART_AMD64}"
+              echo "✅ Copied and renamed amd64 helm chart: ${HELM_CHART_AMD64}"
+            else
+              echo "⚠️  No helm chart found in artifacts/helm-chart-amd64"
+            fi
           fi
           
           if [ -d "artifacts/helm-chart-arm64" ]; then
-            cp artifacts/helm-chart-arm64/*.tgz release-assets/ 2>/dev/null || true
-            echo "✅ Copied arm64 helm chart"
+            HELM_CHART_ARM64="${HELM_CHART_BASE}-helm_arm64.tgz"
+            # Find the original helm chart file
+            ORIGINAL_CHART=$(find artifacts/helm-chart-arm64 -name "*.tgz" -type f | head -1)
+            if [ -n "${ORIGINAL_CHART}" ]; then
+              cp "${ORIGINAL_CHART}" "release-assets/${HELM_CHART_ARM64}"
+              echo "✅ Copied and renamed arm64 helm chart: ${HELM_CHART_ARM64}"
+            else
+              echo "⚠️  No helm chart found in artifacts/helm-chart-arm64"
+            fi
           fi
           
           # Display release assets
@@ -387,52 +427,103 @@ jobs:
             echo "⚠️  Checksums file not found"
           fi
           
+          # Upload helm charts for both architectures
+          HELM_CHART_AMD64="chaosblade-box-agent-${VERSION}-helm_amd64.tgz"
+          HELM_CHART_ARM64="chaosblade-box-agent-${VERSION}-helm_arm64.tgz"
+          
+          # Upload amd64 helm chart
+          if [ -f "release-assets/${HELM_CHART_AMD64}" ]; then
+            echo "Uploading amd64 helm chart..."
+            ossutil cp -f "release-assets/${HELM_CHART_AMD64}" "oss://chaosblade/platform/release/${BINARY_TAG}/${HELM_CHART_AMD64}"
+            echo "✅ amd64 helm chart uploaded successfully"
+            echo "OSS URL: https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${BINARY_TAG}/${HELM_CHART_AMD64}"
+          else
+            echo "⚠️  amd64 helm chart not found: release-assets/${HELM_CHART_AMD64}"
+          fi
+          
+          # Upload arm64 helm chart
+          if [ -f "release-assets/${HELM_CHART_ARM64}" ]; then
+            echo "Uploading arm64 helm chart..."
+            ossutil cp -f "release-assets/${HELM_CHART_ARM64}" "oss://chaosblade/platform/release/${BINARY_TAG}/${HELM_CHART_ARM64}"
+            echo "✅ arm64 helm chart uploaded successfully"
+            echo "OSS URL: https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${BINARY_TAG}/${HELM_CHART_ARM64}"
+          else
+            echo "⚠️  arm64 helm chart not found: release-assets/${HELM_CHART_ARM64}"
+          fi
+          
+          # List available helm chart files for debugging
+          echo "Available helm chart files in release-assets:"
+          ls -la release-assets/*helm*.tgz 2>/dev/null || echo "No helm chart files found in release-assets/"
+          
           echo "All packages uploaded to OSS successfully"
 
-      - name: Create Release
+      - name: Generate release notes
+        run: |
+          cat > release-assets/RELEASE_NOTES.md << 'EOF'
+
+          ### 📦 Downloads
+          Choose the appropriate package for your platform:
+
+          **Docker Images:**
+          - **linux/amd64**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}` - Container image for AMD64 systems
+          - **linux/arm64**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-arm64` - Container image for ARM64 systems
+
+          **Binary Packages:**
+          - **linux/amd64**: `chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz` - For 64-bit Linux systems
+          - **linux/arm64**: `chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz` - For ARM64 Linux systems
+
+          **Helm Charts:**
+          - **linux/amd64**: `chaosblade-box-agent-${{ env.VERSION }}-helm_amd64.tgz` - For AMD64 Kubernetes clusters
+          - **linux/arm64**: `chaosblade-box-agent-${{ env.VERSION }}-helm_arm64.tgz` - For ARM64 Kubernetes clusters
+
+          ### 🌐 OSS Download Links
+          Alternative download links from Alibaba Cloud OSS:
+
+          **Binary Packages:**
+          - **linux/amd64**: [chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz)
+          - **linux/arm64**: [chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz)
+
+          **Helm Charts:**
+          - **linux/amd64**: [chaosblade-box-agent-${{ env.VERSION }}-helm_amd64.tgz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosblade-box-agent-${{ env.VERSION }}-helm_amd64.tgz)
+          - **linux/arm64**: [chaosblade-box-agent-${{ env.VERSION }}-helm_arm64.tgz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosblade-box-agent-${{ env.VERSION }}-helm_arm64.tgz)
+
+          - [checksums.txt](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/checksums.txt) - SHA256 checksums
+
+          ### 🔧 Installation
+
+          **From Binary Package:**
+          ```bash
+          # Download and extract
+          wget https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz
+          tar -xzf chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz
+          ```
+
+          **From Helm Chart:**
+          ```bash
+          # Download helm chart (choose the appropriate architecture)
+          # For AMD64:
+          wget https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosblade-box-agent-${{ env.VERSION }}-helm_amd64.tgz -O chaosblade-box-agent-${{ env.VERSION }}.tgz
+          # For ARM64:
+          # wget https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosblade-box-agent-${{ env.VERSION }}-helm_arm64.tgz -O chaosblade-box-agent-${{ env.VERSION }}.tgz
+          
+          # Install using Helm
+          helm install chaos-agent ./chaosblade-box-agent-${{ env.VERSION }}.tgz --namespace chaosblade
+          ```
+          EOF
+          echo "Release notes generated:"
+          cat release-assets/RELEASE_NOTES.md
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION }}
-          name: Release v${{ env.VERSION }}
-          body: |
-            ## Release v${{ env.VERSION }}
-
-            ### Docker Images
-            - **linux/amd64**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}`
-            - **linux/arm64**: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-arm64`
-
-            ### Binary Packages
-            - **linux/amd64**: `chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz` - For 64-bit Linux systems
-            - **linux/arm64**: `chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz` - For ARM64 Linux systems
-
-            ### Helm Charts
-            See attached Helm chart packages for both architectures.
-
-            ### OSS Download Links
-            Alternative download links from Alibaba Cloud OSS:
-            - **linux/amd64**: [chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz)
-            - **linux/arm64**: [chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_arm64.tar.gz)
-            - [checksums.txt](https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/checksums.txt) - SHA256 checksums
-
-            ### Installation
-
-            **From Binary Package:**
-            ```bash
-            # Download and extract
-            wget https://chaosblade.oss-cn-hangzhou.aliyuncs.com/platform/release/${{ env.VERSION }}/chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz
-            tar -xzf chaosagent-${{ env.VERSION }}-linux_amd64.tar.gz
-            ```
-
-            **From Helm Chart:**
-            ```bash
-            # Install using Helm
-            helm install chaos-agent ./chaos-agent-${{ env.VERSION }}.tgz --namespace chaosblade
-            ```
+          name: v${{ env.VERSION }}
+          draft: ${{ env.DRAFT }}
+          body_path: release-assets/RELEASE_NOTES.md
+          prerelease: false
+          generate_release_notes: true
           files: |
             release-assets/*.tar.gz
             release-assets/checksums.txt
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
