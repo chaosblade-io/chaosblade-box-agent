@@ -19,6 +19,9 @@ controller:
   cluster_id: ""
   cluster_name: ""
   externalIp_enable: false
+  # controller.localIp: Specify the agent IP address (useful when host has multiple IPs)
+  # If set, this IP will have the highest priority and will be used for all Agent-Box communications
+  localIp: ""
 
 # the image repository is related to the running env"
 images:

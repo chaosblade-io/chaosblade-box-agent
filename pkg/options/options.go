@@ -124,6 +124,9 @@ type Options struct {
 	LitmusChartUrl   string
 	CertUrl          string
 
+	// agent ip
+	LocalIp string
+
 	Flags *pflag.FlagSet
 }
 
@@ -211,6 +214,8 @@ func (o *Options) AddFlags() {
 
 	o.Flags.StringVar(&o.Port, "port", "19527", "the agent server port")
 
+	o.Flags.StringVar(&o.LocalIp, "localIp", "", "specify the agent IP address (useful when host has multiple IPs)")
+
 	o.Flags.BoolVarP(&o.Help, "help", "h", false, "Print Help text")
 }
 
@@ -221,7 +226,18 @@ func (o *Options) SetOthersByFlags() {
 	o.IsVpc = false
 	o.VpcId = o.License
 	o.Uid = ""
-	o.Ip = o.GetPrivateIp()
+	// 如果用户指定了 LocalIp，优先使用；否则自动获取
+	if o.LocalIp != "" {
+		// 验证指定的IP格式
+		if !o.isValidIP(o.LocalIp) {
+			logrus.Fatalf("Invalid IP address specified: %s. Please provide a valid IPv4 address.", o.LocalIp)
+		}
+		o.Ip = o.LocalIp
+		logrus.Infof("Using specified agent IP: %s (priority: highest)", o.Ip)
+	} else {
+		o.Ip = o.GetPrivateIp()
+		logrus.Debugf("Using auto-detected agent IP: %s", o.Ip)
+	}
 	o.HostName = o.GetHostName()
 	o.InstanceId = o.GetHostName()
 	o.Version = "1.1.0"
@@ -346,4 +362,14 @@ func (o *Options) GetHostName() string {
 		return ""
 	}
 	return name
+}
+
+// isValidIP 验证IP地址格式是否有效
+func (o *Options) isValidIP(ip string) bool {
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return false
+	}
+	// 只接受IPv4地址
+	return parsedIP.To4() != nil
 }
