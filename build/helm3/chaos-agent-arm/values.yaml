@@ -15,7 +15,6 @@
 # Default values for chaos.
 controller:
   # controller.region_id: The region where the cluster is located, currently only support cn-hangzhou, cn-beijing, cn-shenzhen, cn-shanghai and cn-public(public region)
-  cluster_type: ""
   # supported since 1.5.2 version
   cluster_id: ""
   cluster_name: ""
