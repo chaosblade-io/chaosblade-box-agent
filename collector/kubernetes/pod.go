@@ -323,6 +323,12 @@ func (pi *PodInfo) addLink(resource string, uid string) {
 }
 
 func (collector *PodCollector) setAgentExternalIp() {
+	// 如果用户已经通过 --localIp 参数指定了 IP，则不覆盖
+	if options.Opts.LocalIp != "" {
+		logrus.Debugf("Agent IP is already specified via --localIp flag: %s, skip setting from Service ExternalIP", options.Opts.LocalIp)
+		return
+	}
+
 	serviceInfos, _, err := collector.serviceCollector.getServiceInfo()
 	if err != nil {
 		logrus.Warnf("get service info failed, err: %v", err)

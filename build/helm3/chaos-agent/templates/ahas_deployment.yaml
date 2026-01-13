@@ -70,6 +70,9 @@ spec:
             {{- if .Values.transport.endpoint }}
             - '--transport.endpoint={{ .Values.transport.endpoint }}'
             {{ end }}
+            {{- if .Values.controller.localIp }}
+            - '--localIp={{ .Values.controller.localIp }}'
+            {{- end }}
             - '--kubernetes.pod.report=true'
             - '--kubernetes.externalIp.enable={{ .Values.controller.externalIp_enable }}'
           securityContext:
