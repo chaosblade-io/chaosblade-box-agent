@@ -66,7 +66,11 @@ func getServiceExternalIP(svc *v1.Service, wide bool) string {
 	return "<unknown>"
 }
 
-const loadBalancerWidth = 16
+const (
+	loadBalancerWidth = 16
+	// DefaultAgentServiceName is the default service name for chaos-agent
+	DefaultAgentServiceName = "chaos-agent"
+)
 
 // loadBalancerStatusStringer behaves mostly like a string interface and converts the given status to a string.
 // `wide` indicates whether the returned value is meant for --o=wide output. If not, it's clipped to 16 bytes.

@@ -19,6 +19,7 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -329,10 +330,50 @@ func (collector *PodCollector) setAgentExternalIp() {
 	}
 
 	for _, serviceInfo := range serviceInfos {
-		if serviceInfo.Name != "chaos-agent" {
+		if serviceInfo.Name != DefaultAgentServiceName {
 			continue
 		}
 
-		options.Opts.Ip = serviceInfo.ExternalIp
+		externalIp := serviceInfo.ExternalIp
+		if externalIp == "" {
+			logrus.Debugf("Service %s has empty ExternalIP, skip setting", DefaultAgentServiceName)
+			continue
+		}
+
+		// 处理无效IP
+		invalidIPs := []string{"<none>", "<pending>", "<unknown>"}
+		for _, invalid := range invalidIPs {
+			if externalIp == invalid {
+				logrus.Warnf("Service %s has invalid ExternalIP: %s, skip setting", DefaultAgentServiceName, externalIp)
+				return
+			}
+		}
+
+		// 处理多个IP的情况，取第一个有效IP
+		ips := strings.Split(externalIp, ",")
+		if len(ips) > 0 {
+			validIP := strings.TrimSpace(ips[0])
+			if validIP != "" {
+				// 再次检查是否为无效IP（可能出现在逗号分隔的列表中）
+				isInvalid := false
+				for _, invalid := range invalidIPs {
+					if validIP == invalid {
+						isInvalid = true
+						break
+					}
+				}
+				if !isInvalid {
+					options.Opts.Ip = validIP
+					if len(ips) > 1 {
+						logrus.Infof("Set agent ExternalIP to: %s (from %d IPs: %s)", validIP, len(ips), externalIp)
+					} else {
+						logrus.Infof("Set agent ExternalIP to: %s", validIP)
+					}
+					return
+				}
+			}
+		}
+
+		logrus.Warnf("Service %s ExternalIP is invalid or empty: %s", DefaultAgentServiceName, externalIp)
 	}
 }
