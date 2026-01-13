@@ -67,9 +67,6 @@ spec:
             {{- if .Values.controller.cluster_name }}
             - '--kubernetes.cluster.name={{ .Values.controller.cluster_name }}'
             {{- end }}
-            {{- if .Values.controller.cluster_type }}
-            - '--kubernetes.cluster.type={{ .Values.controller.cluster_type }}'
-            {{- end }}
             {{- if .Values.transport.endpoint }}
             - '--transport.endpoint={{ .Values.transport.endpoint }}'
             {{ end }}
