@@ -48,7 +48,7 @@ func NewServerRequestHandler(handler web.ApiHandler) *ServerRequestHandler {
 // handle(request string) (string, error)
 func (handler *ServerRequestHandler) Handle(request string) (string, error) {
 	handleStartTime := time.Now()
-	logrus.Debugf("Handle: %+v", request)
+	logrus.Infof("[ServerRequestHandler] Handle() called at %v, request length: %d", handleStartTime, len(request))
 	var response *transport.Response
 	select {
 	case <-handler.Ctx.Done():
@@ -59,15 +59,17 @@ func (handler *ServerRequestHandler) Handle(request string) (string, error) {
 		req := &transport.Request{}
 		err := json.Unmarshal([]byte(request), req)
 		if err != nil {
+			logrus.Warningf("[ServerRequestHandler] Request decode failed, duration: %v, error: %v", time.Since(decodeStartTime), err)
 			return "", err
 		}
 		decodeDuration := time.Since(decodeStartTime)
-		logrus.Debugf("Request decode completed, duration: %v", decodeDuration)
+		logrus.Infof("[ServerRequestHandler] Request decode completed, duration: %v, time since handle start: %v", decodeDuration, time.Since(handleStartTime))
 
 		handlerStartTime := time.Now()
+		logrus.Infof("[ServerRequestHandler] Calling Handler.Handle() at %v, time since handle start: %v", handlerStartTime, time.Since(handleStartTime))
 		response = handler.Handler.Handle(req)
 		handlerDuration := time.Since(handlerStartTime)
-		logrus.Debugf("Handler.Handle completed, duration: %v", handlerDuration)
+		logrus.Infof("[ServerRequestHandler] Handler.Handle completed, duration: %v, time since handle start: %v", handlerDuration, time.Since(handleStartTime))
 	}
 	// encode
 	encodeStartTime := time.Now()

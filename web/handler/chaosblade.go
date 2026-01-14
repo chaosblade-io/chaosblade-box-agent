@@ -69,12 +69,17 @@ func (ch *ChaosbladeHandler) Handle(request *transport.Request) *transport.Respo
 func (ch *ChaosbladeHandler) exec(cmd string) *transport.Response {
 	execStartTime := time.Now()
 	logrus.Infof("[chaosblade] exec() called at %v, cmd: %s", execStartTime, cmd)
+
+	fieldsStartTime := time.Now()
 	fields := strings.Fields(cmd)
+	fieldsDuration := time.Since(fieldsStartTime)
+	logrus.Debugf("[chaosblade] Fields parsing completed, duration: %v", fieldsDuration)
 
 	if len(fields) == 0 {
 		logrus.Warning("less command parameters")
 		return transport.ReturnFail(transport.ParameterLess, "command")
 	}
+
 	// 判断 chaosblade 是否存在
 	checkStartTime := time.Now()
 	if !tools.IsExist(options.BladeBinPath) {
@@ -82,12 +87,12 @@ func (ch *ChaosbladeHandler) exec(cmd string) *transport.Response {
 		return transport.ReturnFail(transport.ChaosbladeFileNotFound)
 	}
 	checkDuration := time.Since(checkStartTime)
-	logrus.Debugf("[chaosblade] BladeBinPath check completed, duration: %v", checkDuration)
+	logrus.Debugf("[chaosblade] BladeBinPath check completed, duration: %v, time since exec start: %v", checkDuration, time.Since(execStartTime))
 	command := fields[0]
 
 	// 执行 blade 命令
 	scriptStartTime := time.Now()
-	logrus.Infof("[chaosblade] Starting to execute blade command at %v, cmd: %s", scriptStartTime, cmd)
+	logrus.Infof("[chaosblade] Starting to execute blade command at %v (time since exec start: %v), cmd: %s", scriptStartTime, time.Since(execStartTime), cmd)
 	result, errMsg, ok := bash.ExecScript(context.Background(), options.BladeBinPath, cmd)
 	scriptDuration := time.Since(scriptStartTime)
 	diffTime := time.Since(execStartTime)
@@ -97,13 +102,21 @@ func (ch *ChaosbladeHandler) exec(cmd string) *transport.Response {
 		response := parseResult(result)
 		if !response.Success {
 			logrus.Warningf("execute chaos failed, result: %s", result)
+			// 即使失败，如果是 K8s create 命令，也要检查是否有 uid 并等待状态
+			if isK8sCreateCmd(cmd, command) {
+				uid := ch.extractUidFromResponse(response, result)
+				if uid != "" {
+					logrus.Infof("K8s create command failed but uid found, waiting for operator to process, uid: %s", uid)
+					ch.waitForK8sStatus(uid)
+				}
+			}
 			return response
 		}
 
 		// 对于 K8s create 命令，需要等待并查询状态，确保 chaosblade-operator 处理完成
 		if isK8sCreateCmd(cmd, command) {
-			uid, ok := response.Result.(string)
-			if ok && uid != "" {
+			uid := ch.extractUidFromResponse(response, result)
+			if uid != "" {
 				logrus.Infof("K8s create command detected, waiting for operator to process, uid: %s", uid)
 				ch.waitForK8sStatus(uid)
 			}
@@ -117,8 +130,24 @@ func (ch *ChaosbladeHandler) exec(cmd string) *transport.Response {
 		err := json.Unmarshal([]byte(result), &response)
 		if err != nil {
 			logrus.Warningf("Unmarshal chaosblade error message err: %s, result: %s", err.Error(), result)
+			// 即使解析失败，也要尝试提取 uid（可能结果格式不标准）
+			if isK8sCreateCmd(cmd, command) {
+				uid := ch.extractUidFromRawResult(result)
+				if uid != "" {
+					logrus.Infof("K8s create command failed to parse but uid found in raw result, waiting for operator to process, uid: %s", uid)
+					ch.waitForK8sStatus(uid)
+				}
+			}
 			return transport.ReturnFail(transport.ResultUnmarshalFailed, result, errMsg)
 		} else {
+			// 即使 ok = false，如果是 K8s create 命令，也要检查是否有 uid 并等待状态
+			if isK8sCreateCmd(cmd, command) {
+				uid := ch.extractUidFromResponse(&response, result)
+				if uid != "" {
+					logrus.Infof("K8s create command returned error but uid found, waiting for operator to process, uid: %s", uid)
+					ch.waitForK8sStatus(uid)
+				}
+			}
 			return &response
 		}
 	}
@@ -130,9 +159,22 @@ func (ch *ChaosbladeHandler) exec(cmd string) *transport.Response {
 // arg: 第二个参数，比如 prepare 操作，则 arg 是 jvm，destroy 操作, arg 是 UID
 // todo 这里后面需要看下agent停止的时候有没有把演练中的演练关停
 func (ch *ChaosbladeHandler) handleCacheAndSafePoint(cmdline, command, arg string, response *transport.Response) {
-	logrus.Debugf("handleCacheAndSafePoint, cmdline: %s, command: %s, arg: %s", cmdline, command, arg)
+	handleCacheStartTime := time.Now()
+	logrus.Debugf("[chaosblade] handleCacheAndSafePoint start, cmdline: %s, command: %s, arg: %s", cmdline, command, arg)
+
+	lockStartTime := time.Now()
 	ch.mutex.Lock()
-	defer ch.mutex.Unlock()
+	lockDuration := time.Since(lockStartTime)
+	if lockDuration > 100*time.Millisecond {
+		logrus.Warningf("[chaosblade] mutex.Lock() took %v, this may indicate lock contention", lockDuration)
+	}
+	defer func() {
+		ch.mutex.Unlock()
+		totalDuration := time.Since(handleCacheStartTime)
+		if totalDuration > 500*time.Millisecond {
+			logrus.Warningf("[chaosblade] handleCacheAndSafePoint took %v, this may be slow", totalDuration)
+		}
+	}()
 	if isCreateOrPrepareCmd(command) {
 		// 记录正在运行的演练
 		uid := response.Result.(string)
@@ -410,10 +452,61 @@ func isK8sCreateCmd(cmd string, command string) bool {
 	return strings.EqualFold(fields[1], "k8s")
 }
 
+// extractUidFromResponse 从响应中提取 uid
+func (ch *ChaosbladeHandler) extractUidFromResponse(response *transport.Response, rawResult string) string {
+	if response == nil {
+		return ch.extractUidFromRawResult(rawResult)
+	}
+
+	// 首先尝试从 Result 字段提取（字符串类型）
+	if uid, ok := response.Result.(string); ok && uid != "" {
+		return uid
+	}
+
+	// 如果 Result 是 map，尝试提取 uid 字段
+	if resultMap, ok := response.Result.(map[string]interface{}); ok {
+		if uid, ok := resultMap["uid"].(string); ok && uid != "" {
+			return uid
+		}
+	}
+
+	// 如果 Result 是字符串，尝试解析 JSON
+	if resultStr, ok := response.Result.(string); ok {
+		var resultMap map[string]interface{}
+		if err := json.Unmarshal([]byte(resultStr), &resultMap); err == nil {
+			if uid, ok := resultMap["uid"].(string); ok && uid != "" {
+				return uid
+			}
+		}
+	}
+
+	// 最后尝试从原始结果中提取
+	return ch.extractUidFromRawResult(rawResult)
+}
+
+// extractUidFromRawResult 从原始结果字符串中提取 uid
+func (ch *ChaosbladeHandler) extractUidFromRawResult(rawResult string) string {
+	// 尝试解析 JSON 提取 uid
+	var resultMap map[string]interface{}
+	if err := json.Unmarshal([]byte(rawResult), &resultMap); err == nil {
+		// 检查 result 字段
+		if result, ok := resultMap["result"].(map[string]interface{}); ok {
+			if uid, ok := result["uid"].(string); ok && uid != "" {
+				return uid
+			}
+		}
+		// 检查顶层的 uid 字段
+		if uid, ok := resultMap["uid"].(string); ok && uid != "" {
+			return uid
+		}
+	}
+	return ""
+}
+
 // waitForK8sStatus 等待 K8s 实验状态，确保 chaosblade-operator 处理完成
 // 通过查询状态来确认是否完成，最多等待 10 秒
 func (ch *ChaosbladeHandler) waitForK8sStatus(uid string) {
-	logrus.Debugf("waiting for K8s experiment status, uid: %s", uid)
+	logrus.Infof("[chaosblade] waiting for K8s experiment status, uid: %s", uid)
 	timeoutCtx, cancelFunc := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFunc()
 
@@ -426,10 +519,10 @@ func (ch *ChaosbladeHandler) waitForK8sStatus(uid string) {
 	for {
 		select {
 		case <-timeoutCtx.Done():
-			logrus.Warningf("timeout waiting for K8s experiment status, uid: %s", uid)
+			logrus.Warningf("[chaosblade] timeout waiting for K8s experiment status, uid: %s", uid)
 			return
 		case <-ticker.C:
-			// 查询 K8s 实验状态
+			// 查询 K8s 实验状态，确保命令格式正确（有空格）
 			queryCmd := fmt.Sprintf("query k8s create %s", uid)
 			result, errMsg, ok := bash.ExecScript(context.TODO(), options.BladeBinPath, queryCmd)
 			if !ok {
