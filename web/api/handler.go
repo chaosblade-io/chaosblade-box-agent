@@ -19,6 +19,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -46,6 +47,7 @@ func NewServerRequestHandler(handler web.ApiHandler) *ServerRequestHandler {
 
 // handle(request string) (string, error)
 func (handler *ServerRequestHandler) Handle(request string) (string, error) {
+	handleStartTime := time.Now()
 	logrus.Debugf("Handle: %+v", request)
 	var response *transport.Response
 	select {
@@ -53,18 +55,28 @@ func (handler *ServerRequestHandler) Handle(request string) (string, error) {
 		response = transport.ReturnFail(transport.HandlerClosed)
 	default:
 		// decode
+		decodeStartTime := time.Now()
 		req := &transport.Request{}
 		err := json.Unmarshal([]byte(request), req)
 		if err != nil {
 			return "", err
 		}
+		decodeDuration := time.Since(decodeStartTime)
+		logrus.Debugf("Request decode completed, duration: %v", decodeDuration)
 
+		handlerStartTime := time.Now()
 		response = handler.Handler.Handle(req)
+		handlerDuration := time.Since(handlerStartTime)
+		logrus.Debugf("Handler.Handle completed, duration: %v", handlerDuration)
 	}
 	// encode
+	encodeStartTime := time.Now()
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		return "", err
 	}
+	encodeDuration := time.Since(encodeStartTime)
+	totalDuration := time.Since(handleStartTime)
+	logrus.Debugf("Response encode completed, encode duration: %v, total duration: %v", encodeDuration, totalDuration)
 	return string(bytes), nil
 }
