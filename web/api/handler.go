@@ -19,6 +19,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -46,25 +47,38 @@ func NewServerRequestHandler(handler web.ApiHandler) *ServerRequestHandler {
 
 // handle(request string) (string, error)
 func (handler *ServerRequestHandler) Handle(request string) (string, error) {
-	logrus.Debugf("Handle: %+v", request)
+	handleStartTime := time.Now()
+	logrus.Infof("[ServerRequestHandler] Handle() called at %v, request length: %d", handleStartTime, len(request))
 	var response *transport.Response
 	select {
 	case <-handler.Ctx.Done():
 		response = transport.ReturnFail(transport.HandlerClosed)
 	default:
 		// decode
+		decodeStartTime := time.Now()
 		req := &transport.Request{}
 		err := json.Unmarshal([]byte(request), req)
 		if err != nil {
+			logrus.Warningf("[ServerRequestHandler] Request decode failed, duration: %v, error: %v", time.Since(decodeStartTime), err)
 			return "", err
 		}
+		decodeDuration := time.Since(decodeStartTime)
+		logrus.Infof("[ServerRequestHandler] Request decode completed, duration: %v, time since handle start: %v", decodeDuration, time.Since(handleStartTime))
 
+		handlerStartTime := time.Now()
+		logrus.Infof("[ServerRequestHandler] Calling Handler.Handle() at %v, time since handle start: %v", handlerStartTime, time.Since(handleStartTime))
 		response = handler.Handler.Handle(req)
+		handlerDuration := time.Since(handlerStartTime)
+		logrus.Infof("[ServerRequestHandler] Handler.Handle completed, duration: %v, time since handle start: %v", handlerDuration, time.Since(handleStartTime))
 	}
 	// encode
+	encodeStartTime := time.Now()
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		return "", err
 	}
+	encodeDuration := time.Since(encodeStartTime)
+	totalDuration := time.Since(handleStartTime)
+	logrus.Debugf("Response encode completed, encode duration: %v, total duration: %v", encodeDuration, totalDuration)
 	return string(bytes), nil
 }

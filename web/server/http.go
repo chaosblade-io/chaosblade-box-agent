@@ -19,6 +19,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -33,21 +34,28 @@ func NewHttpServer() web.APiServer {
 
 func (this HttpServer) RegisterHandler(handlerName string, handler web.ServerHandler) error {
 	http.HandleFunc("/"+handlerName, func(writer http.ResponseWriter, request *http.Request) {
-		logrus.Infof("request: %+v", request)
+		requestStartTime := time.Now()
+		logrus.Infof("[%s] HTTP request received at %v, request: %+v", handlerName, requestStartTime, request)
 
+		parseFormStartTime := time.Now()
 		err := request.ParseForm()
 		if err != nil {
-			logrus.Warnf("http handler: %s, get request param wrong, err: %v", handlerName, err)
+			logrus.Warnf("[%s] http handler: %s, get request param wrong, err: %v, parseForm duration: %v", handlerName, handlerName, err, time.Since(parseFormStartTime))
 			return
 		}
+		parseFormDuration := time.Since(parseFormStartTime)
+		logrus.Infof("[%s] ParseForm completed, duration: %v", handlerName, parseFormDuration)
+
+		handleStartTime := time.Now()
 		result, err := handler.Handle(request.Form["body"][0])
+		handleDuration := time.Since(handleStartTime)
 		if err != nil {
 			errBytes := fmt.Sprintf("handle %s request err, %v", handlerName, err)
 			// TODO 存在 json 返回的风险
-			logrus.Warningln(errBytes)
+			logrus.Warningf("[%s] %s, handle duration: %v", handlerName, errBytes, handleDuration)
 			result = errBytes
 		}
-		logrus.Infof("handler result: %s", string(result))
+		logrus.Infof("[%s] handler result: %s, handle duration: %v, total duration: %v", handlerName, string(result), handleDuration, time.Since(requestStartTime))
 		_, err = writer.Write([]byte(result))
 		if err != nil {
 			logrus.Warningf("write response for %s err, %v", handlerName, err)
