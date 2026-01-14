@@ -47,13 +47,13 @@ func ExecOsAgentScript(ctx context.Context, script, args string) (string, bool) 
 func ExecScript(ctx context.Context, script, args string) (string, string, bool) {
 	execStartTime := time.Now()
 	logrus.Infof("[bash] ExecScript called at %v, script: %s, args: %s", execStartTime, script, args)
-	
+
 	newCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 	if ctx == context.Background() {
 		ctx = newCtx
 	}
-	
+
 	checkFileStartTime := time.Now()
 	if !tools.IsExist(script) {
 		logrus.Warningf("[bash] Script file not found, check duration: %v", time.Since(checkFileStartTime))
@@ -63,7 +63,7 @@ func ExecScript(ctx context.Context, script, args string) (string, string, bool)
 	if checkFileDuration > 100*time.Millisecond {
 		logrus.Warningf("[bash] File existence check took %v, this may be slow", checkFileDuration)
 	}
-	
+
 	// 这里需要区分windows || linux || darwin
 	cmdStartTime := time.Now()
 	var cmd *exec.Cmd
@@ -80,7 +80,7 @@ func ExecScript(ctx context.Context, script, args string) (string, string, bool)
 	output, err := cmd.CombinedOutput()
 	outputDuration := time.Since(outputStartTime)
 	totalDuration := time.Since(execStartTime)
-	
+
 	if err != nil {
 		logrus.Warningf("[bash] Command execution failed, output duration: %v, total duration: %v, error: %v", outputDuration, totalDuration, err)
 		return string(output), err.Error(), false
