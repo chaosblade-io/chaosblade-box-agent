@@ -191,6 +191,8 @@ func (collector *VirtualNodeCollector) getPods(node *v1.Node) ([]PodInfo, error)
 
 // 处理 virtual 增量
 func (collector *VirtualNodeCollector) handleVirtualNodeIncrement(virtualNodeInfo *VirtualNodeInfo) *VirtualNodeInfo {
+	collector.IdentifierLock.Lock()
+	defer collector.IdentifierLock.Unlock()
 	sumData, err := tools.Md5sumData(virtualNodeInfo)
 	if err == nil {
 		if v, ok := collector.identifiers[virtualNodeInfo.Uid]; ok {
@@ -222,6 +224,7 @@ func (collector *VirtualNodeCollector) handleVirtualNodeIncrement(virtualNodeInf
 }
 
 func (collector *VirtualNodeCollector) reportNotExistResource() {
+	collector.IdentifierLock.Lock()
 	// old pods
 	var pods = make([]PodInfo, 0)
 	podIdentifiers := collector.secondIdentifiers
@@ -269,10 +272,13 @@ func (collector *VirtualNodeCollector) reportNotExistResource() {
 			}
 		}
 	}
+	collector.IdentifierLock.Unlock()
 	collector.reportK8sMetric(metav1.NamespaceAll, true, nodes, len(nodes))
 }
 
 func (collector *VirtualNodeCollector) handlePodInfoIncrement(podInfo *PodInfo) PodInfo {
+	collector.IdentifierLock.Lock()
+	defer collector.IdentifierLock.Unlock()
 	sumData, err := tools.Md5sumData(podInfo)
 	if err == nil {
 		if v, ok := collector.secondIdentifiers[podInfo.Uid]; ok {

@@ -172,8 +172,8 @@ func (collector *DaemonsetCollector) reportNotExistResource() {
 				delete(daemonsetIdentifiers, k)
 			}
 		}
-		collector.IdentifierLock.Unlock()
 	}
+	collector.IdentifierLock.Unlock()
 	collector.reportK8sMetric(metav1.NamespaceAll, false, daemonsets, len(daemonsets))
 }
 func createDaemonSetListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
