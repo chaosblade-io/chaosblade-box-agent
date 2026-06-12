@@ -50,6 +50,7 @@ func (handler *ServerRequestHandler) Handle(request string) (string, error) {
 	handleStartTime := time.Now()
 	logrus.Infof("[ServerRequestHandler] Handle() called at %v, request length: %d", handleStartTime, len(request))
 	var response *transport.Response
+	var allow bool
 	select {
 	case <-handler.Ctx.Done():
 		response = transport.ReturnFail(transport.HandlerClosed)
@@ -65,11 +66,14 @@ func (handler *ServerRequestHandler) Handle(request string) (string, error) {
 		decodeDuration := time.Since(decodeStartTime)
 		logrus.Infof("[ServerRequestHandler] Request decode completed, duration: %v, time since handle start: %v", decodeDuration, time.Since(handleStartTime))
 
-		handlerStartTime := time.Now()
-		logrus.Infof("[ServerRequestHandler] Calling Handler.Handle() at %v, time since handle start: %v", handlerStartTime, time.Since(handleStartTime))
-		response = handler.Handler.Handle(req)
-		handlerDuration := time.Since(handlerStartTime)
-		logrus.Infof("[ServerRequestHandler] Handler.Handle completed, duration: %v, time since handle start: %v", handlerDuration, time.Since(handleStartTime))
+		//拦截器先拦截，允许之后再执行
+		if response, allow = handler.Interceptor.Handle(req); allow {
+			handlerStartTime := time.Now()
+			logrus.Infof("[ServerRequestHandler] Calling Handler.Handle() at %v, time since handle start: %v", handlerStartTime, time.Since(handleStartTime))
+			response = handler.Handler.Handle(req)
+			handlerDuration := time.Since(handlerStartTime)
+			logrus.Infof("[ServerRequestHandler] Handler.Handle completed, duration: %v, time since handle start: %v", handlerDuration, time.Since(handleStartTime))
+		}
 	}
 	// encode
 	encodeStartTime := time.Now()

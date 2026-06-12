@@ -80,12 +80,14 @@ func (request *Request) AddParam(key string, value string) *Request {
 // GetBody get body
 func (request *Request) GetBody() map[string]string {
 	body := make(map[string]string, 0)
-	for k, v := range request.Params {
-		body[k] = v
-	}
+	// 在JavaInstall时，Header中Uid为空如果放在Params下面，会生成空的UID。这里改成Params优先
 	for k, v := range request.Headers {
 		body[k] = v
 	}
+	for k, v := range request.Params {
+		body[k] = v
+	}
+	
 	return body
 }
 
