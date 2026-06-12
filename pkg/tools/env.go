@@ -21,7 +21,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -63,9 +62,9 @@ var (
 
 // GetUserHome return user home.
 func GetUserHome() string {
-	user, err := user.Current()
+	home, err := os.UserHomeDir()
 	if err == nil {
-		return user.HomeDir
+		return home
 	}
 	return "/root"
 }

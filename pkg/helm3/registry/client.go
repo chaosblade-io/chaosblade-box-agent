@@ -184,7 +184,8 @@ func (c *Client) PullChart(ref *Reference) (*bytes.Buffer, error) {
 	numLayers := len(layerDescriptors)
 	if numLayers < 1 {
 		return buf, errors.New(
-			fmt.Sprintf("manifest does not contain at least 1 layer (total: %d)", numLayers))
+			fmt.Sprintf("manifest does not contain at least 1 layer (total: %d)", numLayers),
+		)
 	}
 
 	var contentLayer *ocispec.Descriptor
@@ -199,7 +200,8 @@ func (c *Client) PullChart(ref *Reference) (*bytes.Buffer, error) {
 	if contentLayer == nil {
 		return buf, errors.New(
 			fmt.Sprintf("manifest does not contain a layer with mediatype %s",
-				HelmChartContentLayerMediaType))
+				HelmChartContentLayerMediaType),
+		)
 	}
 
 	_, b, ok := store.Get(*contentLayer)
