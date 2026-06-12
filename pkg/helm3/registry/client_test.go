@@ -285,7 +285,8 @@ func initCompromisedRegistryTestServer() string {
       "size": 1
     }
   ]
-}`))
+}`,
+			))
 		} else if r.URL.Path == "/v2/testrepo/supposedlysafechart/blobs/sha256:a705ee2789ab50a5ba20930f246dbd5cc01ff9712825bb98f57ee8414377f133" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(200)
