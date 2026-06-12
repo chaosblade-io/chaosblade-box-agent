@@ -13,8 +13,10 @@
 # limitations under the License.
 
 .PHONY: build clean
-export AGENT_VERSION = 1.1.0
-export BLADE_VERSION = 1.8.0
+AGENT_VERSION ?= 1.1.0
+BLADE_VERSION ?= 1.8.0
+export AGENT_VERSION
+export BLADE_VERSION
 
 BLADE_SRC_ROOT=$(shell pwd)
 
