@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -54,16 +53,18 @@ type Constants struct {
 	Bucket             string
 }
 
-var chaosPath string
-var metricPath string
-var agentPath string
-var chaosLogFilePath string
+var (
+	chaosPath        string
+	metricPath       string
+	agentPath        string
+	chaosLogFilePath string
+)
 
 // GetUserHome return user home.
 func GetUserHome() string {
-	user, err := user.Current()
+	home, err := os.UserHomeDir()
 	if err == nil {
-		return user.HomeDir
+		return home
 	}
 	return "/root"
 }
@@ -104,7 +105,7 @@ func GetMetricDirectory() string {
 	}
 	metricPath = path.Join(GetCurrentDirectory(), "metric")
 	if !IsExist(metricPath) {
-		err := os.MkdirAll(metricPath, 0755)
+		err := os.MkdirAll(metricPath, 0o755)
 		if err != nil {
 			logrus.Fatalln("Cannot get metric path")
 			return GetCurrentDirectory()
@@ -130,7 +131,7 @@ func GetAgentDirectory() string {
 	}
 	agentPath = path.Join(GetCurrentDirectory(), "agent")
 	if !IsExist(agentPath) {
-		err := os.MkdirAll(agentPath, 0755)
+		err := os.MkdirAll(agentPath, 0o755)
 		if err != nil {
 			logrus.Fatalln("Cannot get java agent path")
 			return GetCurrentDirectory()

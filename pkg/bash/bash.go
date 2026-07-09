@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/chaosblade-io/chaos-agent/pkg/tools"
 )
@@ -44,26 +45,47 @@ func ExecOsAgentScript(ctx context.Context, script, args string) (string, bool) 
 // string: 错误信息
 // bool: 是否成功
 func ExecScript(ctx context.Context, script, args string) (string, string, bool) {
+	execStartTime := time.Now()
+	logrus.Infof("[bash] ExecScript called at %v, script: %s, args: %s", execStartTime, script, args)
+
 	newCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
 	defer cancel()
 	if ctx == context.Background() {
 		ctx = newCtx
 	}
+
+	checkFileStartTime := time.Now()
 	if !tools.IsExist(script) {
+		logrus.Warningf("[bash] Script file not found, check duration: %v", time.Since(checkFileStartTime))
 		return "", fmt.Sprintf("%s not found", script), false
 	}
+	checkFileDuration := time.Since(checkFileStartTime)
+	if checkFileDuration > 100*time.Millisecond {
+		logrus.Warningf("[bash] File existence check took %v, this may be slow", checkFileDuration)
+	}
+
 	// 这里需要区分windows || linux || darwin
+	cmdStartTime := time.Now()
 	var cmd *exec.Cmd
 	if tools.IsWindows() {
 		cmd = exec.CommandContext(ctx, "cmd.exe", "/c", script+" "+args)
 	} else {
 		cmd = exec.CommandContext(ctx, "/bin/sh", "-c", script+" "+args)
 	}
+	cmdCreateDuration := time.Since(cmdStartTime)
+	logrus.Debugf("[bash] Command created, duration: %v, time since exec start: %v", cmdCreateDuration, time.Since(execStartTime))
 
+	outputStartTime := time.Now()
+	logrus.Infof("[bash] Starting to execute command at %v (time since ExecScript start: %v)", outputStartTime, time.Since(execStartTime))
 	output, err := cmd.CombinedOutput()
+	outputDuration := time.Since(outputStartTime)
+	totalDuration := time.Since(execStartTime)
+
 	if err != nil {
+		logrus.Warningf("[bash] Command execution failed, output duration: %v, total duration: %v, error: %v", outputDuration, totalDuration, err)
 		return string(output), err.Error(), false
 	}
+	logrus.Infof("[bash] Command execution completed, output duration: %v, total duration: %v, output length: %d", outputDuration, totalDuration, len(output))
 	return string(output), "", true
 }
 

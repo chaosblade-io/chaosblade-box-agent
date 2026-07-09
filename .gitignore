@@ -16,3 +16,7 @@ tmp
 trace.out
 *.out
 .DS_Store
+build/image_musl/agent
+build/agent
+build/*.tar.gz
+build/package

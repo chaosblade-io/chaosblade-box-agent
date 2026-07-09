@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -36,23 +37,24 @@ import (
 )
 
 type PodCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	serviceCollector *ServiceCollector
 
 	opts metav1.ListOptions
 }
 
 func NewPodCollector(trans *transport.TransportClient, k8sChannel *kubernetes.Channel,
-	serviceCollector *ServiceCollector, opts metav1.ListOptions) *PodCollector {
+	serviceCollector *ServiceCollector, opts metav1.ListOptions,
+) *PodCollector {
 	uri, ok := transport.TransportUriMap[transport.API_K8S_POD]
 	if !ok {
 		return nil
 	}
 	collector := createK8sBaseCollector(kubernetes.PodResource, k8sChannel, trans, uri)
 	return &PodCollector{
-		collector,
-		serviceCollector,
-		opts,
+		K8sBaseCollector: collector,
+		serviceCollector: serviceCollector,
+		opts:             opts,
 	}
 }
 
@@ -89,13 +91,13 @@ func (collector *PodCollector) getSelectors() []func(node podNode) {
 func (collector *PodCollector) getPodInfo(selectors []func(node podNode)) ([]*PodInfo, error) {
 	podList := collector.indexer.List()
 	logrus.Debugf("[POD REPORT] get pods from indexer len : %v", len(podList))
-	var pods = make([]*PodInfo, 0)
+	pods := make([]*PodInfo, 0)
 	for _, p := range podList {
 		pod, ok := p.(*v1.Pod)
 		if !ok {
 			continue
 		}
-		var status = getPodState(pod)
+		status := getPodState(pod)
 		// pod uid
 		podUid := string(pod.UID)
 		if hash, ok := pod.Annotations["kubernetes.io/config.hash"]; ok {
@@ -119,7 +121,7 @@ func (collector *PodCollector) getPodInfo(selectors []func(node podNode)) ([]*Po
 		podInfo = collector.handlePodIncrement(podInfo)
 		pods = append(pods, podInfo)
 		// 建立 pod 与 service 等的关系
-		for idx, _ := range selectors {
+		for idx := range selectors {
 			selectors[idx](podInfo)
 		}
 	}
@@ -163,7 +165,7 @@ func (collector *PodCollector) handlePodIncrement(podInfo *PodInfo) *PodInfo {
 func (collector *PodCollector) reportNotExistResource() {
 	// old pods
 	collector.IdentifierLock.Lock()
-	var pods = make([]*PodInfo, 0)
+	pods := make([]*PodInfo, 0)
 	podIdentifiers := collector.identifiers
 	logrus.Debugf("podIdentifiers len: %d", len(podIdentifiers))
 	if podIdentifiers != nil {
@@ -321,6 +323,12 @@ func (pi *PodInfo) addLink(resource string, uid string) {
 }
 
 func (collector *PodCollector) setAgentExternalIp() {
+	// 如果用户已经通过 --localIp 参数指定了 IP，则不覆盖
+	if options.Opts.LocalIp != "" {
+		logrus.Debugf("Agent IP is already specified via --localIp flag: %s, skip setting from Service ExternalIP", options.Opts.LocalIp)
+		return
+	}
+
 	serviceInfos, _, err := collector.serviceCollector.getServiceInfo()
 	if err != nil {
 		logrus.Warnf("get service info failed, err: %v", err)
@@ -328,10 +336,50 @@ func (collector *PodCollector) setAgentExternalIp() {
 	}
 
 	for _, serviceInfo := range serviceInfos {
-		if serviceInfo.Name != "chaos-agent" {
+		if serviceInfo.Name != DefaultAgentServiceName {
 			continue
 		}
 
-		options.Opts.Ip = serviceInfo.ExternalIp
+		externalIp := serviceInfo.ExternalIp
+		if externalIp == "" {
+			logrus.Debugf("Service %s has empty ExternalIP, skip setting", DefaultAgentServiceName)
+			continue
+		}
+
+		// 处理无效IP
+		invalidIPs := []string{"<none>", "<pending>", "<unknown>"}
+		for _, invalid := range invalidIPs {
+			if externalIp == invalid {
+				logrus.Warnf("Service %s has invalid ExternalIP: %s, skip setting", DefaultAgentServiceName, externalIp)
+				return
+			}
+		}
+
+		// 处理多个IP的情况，取第一个有效IP
+		ips := strings.Split(externalIp, ",")
+		if len(ips) > 0 {
+			validIP := strings.TrimSpace(ips[0])
+			if validIP != "" {
+				// 再次检查是否为无效IP（可能出现在逗号分隔的列表中）
+				isInvalid := false
+				for _, invalid := range invalidIPs {
+					if validIP == invalid {
+						isInvalid = true
+						break
+					}
+				}
+				if !isInvalid {
+					options.Opts.Ip = validIP
+					if len(ips) > 1 {
+						logrus.Infof("Set agent ExternalIP to: %s (from %d IPs: %s)", validIP, len(ips), externalIp)
+					} else {
+						logrus.Infof("Set agent ExternalIP to: %s", validIP)
+					}
+					return
+				}
+			}
+		}
+
+		logrus.Warnf("Service %s ExternalIP is invalid or empty: %s", DefaultAgentServiceName, externalIp)
 	}
 }

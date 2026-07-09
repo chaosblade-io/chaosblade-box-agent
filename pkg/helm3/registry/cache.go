@@ -1,4 +1,20 @@
 /*
+ * Copyright 2025 The ChaosBlade Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
 Copyright The Helm Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -113,7 +129,8 @@ func (cache *Cache) FetchReference(ref *Reference) (*CacheRefSummary, error) {
 			numLayers := len(manifest.Layers)
 			if numLayers != 1 {
 				return &r, errors.New(
-					fmt.Sprintf("manifest does not contain exactly 1 layer (total: %d)", numLayers))
+					fmt.Sprintf("manifest does not contain exactly 1 layer (total: %d)", numLayers),
+				)
 			}
 			var contentLayer *ocispec.Descriptor
 			for _, layer := range manifest.Layers {
@@ -124,11 +141,13 @@ func (cache *Cache) FetchReference(ref *Reference) (*CacheRefSummary, error) {
 			}
 			if contentLayer == nil {
 				return &r, errors.New(
-					fmt.Sprintf("manifest does not contain a layer with mediatype %s", HelmChartContentLayerMediaType))
+					fmt.Sprintf("manifest does not contain a layer with mediatype %s", HelmChartContentLayerMediaType),
+				)
 			}
 			if contentLayer.Size == 0 {
 				return &r, errors.New(
-					fmt.Sprintf("manifest layer with mediatype %s is of size 0", HelmChartContentLayerMediaType))
+					fmt.Sprintf("manifest layer with mediatype %s is of size 0", HelmChartContentLayerMediaType),
+				)
 			}
 			r.ContentLayer = contentLayer
 			info, err := cache.ociStore.Info(ctx(cache.out, cache.debug), contentLayer.Digest)
@@ -287,7 +306,7 @@ func (cache *Cache) saveChartConfig(ch *chart.Chart) (*ocispec.Descriptor, bool,
 // saveChartContentLayer stores the chart as tarball blob and returns a descriptor
 func (cache *Cache) saveChartContentLayer(ch *chart.Chart) (*ocispec.Descriptor, bool, error) {
 	destDir := filepath.Join(cache.rootDir, ".build")
-	os.MkdirAll(destDir, 0755)
+	os.MkdirAll(destDir, 0o755)
 	tmpFile, err := chartutil.Save(ch, destDir)
 	defer os.Remove(tmpFile)
 	if err != nil {

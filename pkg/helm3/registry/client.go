@@ -1,4 +1,20 @@
 /*
+ * Copyright 2025 The ChaosBlade Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
 Copyright The Helm Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,7 +184,8 @@ func (c *Client) PullChart(ref *Reference) (*bytes.Buffer, error) {
 	numLayers := len(layerDescriptors)
 	if numLayers < 1 {
 		return buf, errors.New(
-			fmt.Sprintf("manifest does not contain at least 1 layer (total: %d)", numLayers))
+			fmt.Sprintf("manifest does not contain at least 1 layer (total: %d)", numLayers),
+		)
 	}
 
 	var contentLayer *ocispec.Descriptor
@@ -177,14 +194,14 @@ func (c *Client) PullChart(ref *Reference) (*bytes.Buffer, error) {
 		switch layer.MediaType {
 		case HelmChartContentLayerMediaType:
 			contentLayer = &layer
-
 		}
 	}
 
 	if contentLayer == nil {
 		return buf, errors.New(
 			fmt.Sprintf("manifest does not contain a layer with mediatype %s",
-				HelmChartContentLayerMediaType))
+				HelmChartContentLayerMediaType),
+		)
 	}
 
 	_, b, ok := store.Get(*contentLayer)

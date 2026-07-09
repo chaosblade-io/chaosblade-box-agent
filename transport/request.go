@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,12 +82,14 @@ func (request *Request) AddParam(key string, value string) *Request {
 // GetBody get body
 func (request *Request) GetBody() map[string]string {
 	body := make(map[string]string, 0)
-	for k, v := range request.Params {
-		body[k] = v
-	}
+	// 在JavaInstall时，Header中Uid为空如果放在Params下面，会生成空的UID。这里改成Params优先
 	for k, v := range request.Headers {
 		body[k] = v
 	}
+	for k, v := range request.Params {
+		body[k] = v
+	}
+	
 	return body
 }
 
@@ -115,7 +117,7 @@ const (
 	// service
 	Chaos = "Chaos" // replace
 
-	//handler
+	// handler
 	MKChaosbladeAsync = "chaos/chaosbladeAsync"
 
 	HttpHandlerRegister           = "chaos/AgentRegister"
@@ -126,7 +128,7 @@ const (
 	HttpHandlerJavaAgentUninstall = "chaos/javaAgentUninstall"
 	HttpHandlerAgentEvent         = "chaos/AgentEvent"
 
-	//k8s metric
+	// k8s metric
 	HttpHandlerK8sVirtualNode = "chaos/k8sVirtualNode"
 	HttpHandlerK8sPod         = "chaos/k8sPod"
 )

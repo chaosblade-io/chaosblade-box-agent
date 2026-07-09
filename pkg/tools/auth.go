@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,12 @@ const (
 	AppGroupKeyName    = "appGroup"
 )
 
-var AppFile = path.Join(GetCurrentDirectory(), ".chaos.app")
-var localAccessKey = ""
-var localSecureKey = ""
-var mutex = sync.RWMutex{}
+var (
+	AppFile        = path.Join(GetCurrentDirectory(), ".chaos.app")
+	localAccessKey = ""
+	localSecureKey = ""
+	mutex          = sync.RWMutex{}
+)
 
 // GetAccessKey
 func GetAccessKey() string {
@@ -127,7 +129,7 @@ func RecordMapToFile(data map[string]string, filePath string, truncate bool) err
 	if truncate {
 		flag = flag | os.O_TRUNC
 	}
-	file, err := os.OpenFile(filePath, flag, 0666)
+	file, err := os.OpenFile(filePath, flag, 0o666)
 	defer file.Close()
 	if err != nil {
 		log.WithField("file", filePath).WithError(err).Errorf("record data to file failed")
@@ -170,5 +172,5 @@ func ReadAppInfoFromFile() (appInstance, appGroup string, err error) {
 			appGroup = kv[1]
 		}
 	}
-	return
+	return appInstance, appGroup, err
 }

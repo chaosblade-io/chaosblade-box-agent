@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 )
 
 func servicePortsToString(ports []v1.ServicePort) []string {
-	var ps = make([]string, 0)
+	ps := make([]string, 0)
 	for _, port := range ports {
 		// "32242->80/TCP/http"
 		ps = append(ps, fmt.Sprintf("%d->%d/%s/%s", port.NodePort, port.Port, port.Protocol, port.Name))
@@ -66,7 +66,11 @@ func getServiceExternalIP(svc *v1.Service, wide bool) string {
 	return "<unknown>"
 }
 
-const loadBalancerWidth = 16
+const (
+	loadBalancerWidth = 16
+	// DefaultAgentServiceName is the default service name for chaos-agent
+	DefaultAgentServiceName = "chaos-agent"
+)
 
 // loadBalancerStatusStringer behaves mostly like a string interface and converts the given status to a string.
 // `wide` indicates whether the returned value is meant for --o=wide output. If not, it's clipped to 16 bytes.

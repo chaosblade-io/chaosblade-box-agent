@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,6 @@ func main() {
 	// new api
 	api := api2.NewAPI()
 	err = api.Register(transportClient, k8sInstance, h)
-
 	if err != nil {
 		logrus.Errorf("register api failed, err: %s", err.Error())
 		handlerErr(err)
@@ -123,7 +122,7 @@ func handlerErr(err error) {
 }
 
 func writePid(pid int) error {
-	file, err := os.OpenFile(pidFile, os.O_RDWR|os.O_CREATE, 0755)
+	file, err := os.OpenFile(pidFile, os.O_RDWR|os.O_CREATE, 0o755)
 	if err != nil {
 		return err
 	}

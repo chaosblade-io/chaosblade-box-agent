@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ func (h *Helm) Install(charts *chart.Chart, args map[string]string) error {
 	if err != nil {
 		return err
 	}
-	//add vals
+	// add vals
 	if err := strvals.ParseInto(args["set"], vals); err != nil {
 		return err
 	}
@@ -130,5 +130,4 @@ func (helm *Helm) Uninstall() error {
 func (helm *Helm) List() ([]*release.Release, error) {
 	client := action.NewList(helm.actionConfig)
 	return client.Run()
-
 }

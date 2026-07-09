@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ func NewHttpClient(config options.TransportConfig) (transport.TransportChannel, 
 		return nil, errors.New("transport endpoint is empty")
 	}
 	hostAndPort := strings.SplitN(config.Endpoint, ":", 2)
-	var port = 80
+	port := 80
 	if len(hostAndPort) > 1 {
 		port, _ = strconv.Atoi(hostAndPort[1])
 	}

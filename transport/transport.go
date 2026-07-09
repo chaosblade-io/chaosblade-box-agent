@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import (
 type TransportChannel interface {
 	DoInvoker(uri Uri, jsonParam string) (string, error)
 
-	//Init(config ServerConfig) error
-	//Call(outerReqId string, rpcMetadata Metadata, jsonParam string) (string, error)
+	// Init(config ServerConfig) error
+	// Call(outerReqId string, rpcMetadata Metadata, jsonParam string) (string, error)
 }
 
 type Metadata struct {
@@ -122,7 +122,7 @@ func (tc *TransportClient) Invoke(uri Uri, request *Request, needInterceptor boo
 
 	// set requestId
 
-	var requestId = tools.GetUUID()
+	requestId := tools.GetUUID()
 	request.AddHeader("rid", requestId)
 	uri.RequestId = requestId
 

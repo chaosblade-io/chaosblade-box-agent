@@ -1,4 +1,20 @@
 /*
+ * Copyright 2025 The ChaosBlade Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
 Copyright The Helm Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,10 +49,10 @@ import (
 
 	"github.com/containerd/containerd/errdefs"
 	auth "github.com/deislabs/oras/pkg/auth/docker"
-	"github.com/docker/distribution/configuration"
-	"github.com/docker/distribution/registry"
-	_ "github.com/docker/distribution/registry/auth/htpasswd"
-	_ "github.com/docker/distribution/registry/storage/driver/inmemory"
+	"github.com/distribution/distribution/v3/configuration"
+	"github.com/distribution/distribution/v3/registry"
+	_ "github.com/distribution/distribution/v3/registry/auth/htpasswd"
+	_ "github.com/distribution/distribution/v3/registry/storage/driver/inmemory"
 	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
@@ -63,7 +79,7 @@ type RegistryClientTestSuite struct {
 func (suite *RegistryClientTestSuite) SetupSuite() {
 	suite.CacheRootDir = testCacheRootDir
 	os.RemoveAll(suite.CacheRootDir)
-	os.Mkdir(suite.CacheRootDir, 0700)
+	os.Mkdir(suite.CacheRootDir, 0o700)
 
 	var out bytes.Buffer
 	suite.Out = &out
@@ -101,7 +117,7 @@ func (suite *RegistryClientTestSuite) SetupSuite() {
 	pwBytes, err := bcrypt.GenerateFromPassword([]byte(testPassword), bcrypt.DefaultCost)
 	suite.Nil(err, "no error generating bcrypt password for test htpasswd file")
 	htpasswdPath := filepath.Join(suite.CacheRootDir, testHtpasswdFileBasename)
-	err = ioutil.WriteFile(htpasswdPath, []byte(fmt.Sprintf("%s:%s\n", testUsername, string(pwBytes))), 0644)
+	err = ioutil.WriteFile(htpasswdPath, []byte(fmt.Sprintf("%s:%s\n", testUsername, string(pwBytes))), 0o644)
 	suite.Nil(err, "no error creating test htpasswd file")
 
 	// Registry config
@@ -165,7 +181,6 @@ func (suite *RegistryClientTestSuite) Test_1_SaveChart() {
 }
 
 func (suite *RegistryClientTestSuite) Test_2_LoadChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -182,7 +197,6 @@ func (suite *RegistryClientTestSuite) Test_2_LoadChart() {
 }
 
 func (suite *RegistryClientTestSuite) Test_3_PushChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -197,7 +211,6 @@ func (suite *RegistryClientTestSuite) Test_3_PushChart() {
 }
 
 func (suite *RegistryClientTestSuite) Test_4_PullChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -217,7 +230,6 @@ func (suite *RegistryClientTestSuite) Test_5_PrintChartTable() {
 }
 
 func (suite *RegistryClientTestSuite) Test_6_RemoveChart() {
-
 	// non-existent ref
 	ref, err := ParseReference(fmt.Sprintf("%s/testrepo/whodis:9.9.9", suite.DockerRegistryHost))
 	suite.Nil(err)
@@ -273,7 +285,8 @@ func initCompromisedRegistryTestServer() string {
       "size": 1
     }
   ]
-}`))
+}`,
+			))
 		} else if r.URL.Path == "/v2/testrepo/supposedlysafechart/blobs/sha256:a705ee2789ab50a5ba20930f246dbd5cc01ff9712825bb98f57ee8414377f133" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(200)

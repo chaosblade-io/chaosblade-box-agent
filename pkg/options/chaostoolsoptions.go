@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,22 @@ var PrepareOperation = map[string]bool{
 	"prepare": true,
 	"p":       true,
 }
+
 var CreateOperation = map[string]bool{
 	"create": true,
 	"c":      true,
 }
+
 var RevokeOperation = map[string]bool{
 	"revoke": true,
 	"r":      true,
 }
+
 var DestroyOperation = map[string]bool{
 	"destroy": true,
 	"d":       true,
 }
+
 var AsyncParamer = map[string]bool{
 	"async": true,
 	"a":     true,

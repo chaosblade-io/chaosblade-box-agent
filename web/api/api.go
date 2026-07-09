@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,17 @@ import (
 
 type API struct {
 	chaosweb.APiServer
-	//ready func(http.HandlerFunc) http.HandlerFunc
-
+	// ready func(http.HandlerFunc) http.HandlerFunc
 }
 
 // community just use http
 func NewAPI() *API {
-
 	return &API{
 		server.NewHttpServer(),
 	}
 }
 
 func (api *API) Register(transportClient *transport.TransportClient, k8sInstance *kubernetes.Channel, helm *helm3.Helm) error {
-
 	chaosbladeHandler := NewServerRequestHandler(handler.NewChaosbladeHandler(transportClient))
 	if err := api.RegisterHandler("chaosblade", chaosbladeHandler); err != nil {
 		return err

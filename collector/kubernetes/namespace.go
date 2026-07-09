@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import (
 )
 
 type NamespaceCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 
@@ -52,8 +52,8 @@ func NewNamespaceCollector(trans *transport.TransportClient, k8sChannel *kuberne
 	collector := createK8sBaseCollector(kubernetes.NodeResource, k8sChannel, trans, uri)
 
 	return &NamespaceCollector{
-		collector,
-		opts,
+		K8sBaseCollector: collector,
+		opts:             opts,
 	}
 }
 
@@ -94,7 +94,7 @@ func (collector *NamespaceCollector) getNamespaces() ([]string, error) {
 
 func (collector *NamespaceCollector) getNamespaceInfo() ([]*NamespaceInfo, error) {
 	list := collector.indexer.List()
-	var namespaces = make([]*NamespaceInfo, 0)
+	namespaces := make([]*NamespaceInfo, 0)
 	for _, ns := range list {
 		namespace := ns.(*v1.Namespace)
 		namespaceInfo := &NamespaceInfo{
@@ -146,7 +146,7 @@ func (collector *NamespaceCollector) handleNamespaceIncrement(namespaceInfo *Nam
 
 func (collector *NamespaceCollector) reportNotExistResource() {
 	// old pods
-	var namespaces = make([]*NamespaceInfo, 0)
+	namespaces := make([]*NamespaceInfo, 0)
 	collector.IdentifierLock.Lock()
 	identifiers := collector.identifiers
 	logrus.Debugf("[NAMESPACE REPORT] namespaceIdentifiers len: %d", len(identifiers))
@@ -174,7 +174,6 @@ func (collector *NamespaceCollector) reportNotExistResource() {
 }
 
 func createNamespaceListWatch(kubeClient clientset.Interface, ns string, options metav1.ListOptions) cache.ListerWatcher {
-
 	return &cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
 			return kubeClient.CoreV1().Namespaces().List(context.TODO(), options)

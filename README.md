@@ -10,19 +10,81 @@ The Agent are mainly used for platform-side establishment, command delivery chan
 This project can be compiled and used separately, but it is more recommended to use [chaosblade-box-agent](https://github.com/chaosblade-io/chaosblade-box-agent)  tool to use. For detailed English documentation, please refer to: https://chaosblade.io/en/docs/getting-started/installation-and-deployment/agent-install/
 
 ## Compile
-This project is written in golang, so you need to install the latest golang version first. The minimum supported version is 1.11. After the Clone project, enter the project directory and execute the following command to compile:
-```shell script
-make
+
+This project is written in golang, so you need to install the latest golang version first. The minimum supported version is 1.11. After cloning the project, enter the project directory and execute the following commands:
+
+### Build Binary
+
+```bash
+# Build the chaos agent binary (for current platform)
+make build
+
+# Build for linux/amd64
+make build_amd64
+
+# Build for linux/arm64
+make build_arm64
 ```
-If on a mac system, compile the current system version, execute:
-```shell script
-make build_darwin
+
+### Build Docker Image
+
+```bash
+# Build Docker image for amd64
+make build_image_amd64
+
+# Build Docker image for arm64
+make build_image_arm64
 ```
-If you want to compile linux system version on mac system, execute:
-```shell script
-make build_linux
+
+### Build Helm Chart
+
+```bash
+# Package Helm chart for amd64
+make build_chart_amd64
+
+# Package Helm chart for arm64
+make build_chart_arm64
 ```
-You can also only clone [chaosblade-box-agent](https://github.com/chaosblade-io/chaosblade-box-agent) project, execute `make` or` make build_linux` in the project directory to compile it uniformly.
+
+### Package Agent
+
+```bash
+# Package agent binary, scripts and chaosblade tool
+# Note: Requires build_amd64 or build_arm64 to be run first
+make package ARCH=amd64
+# or
+make package ARCH=arm64
+```
+
+### Clean Build Artifacts
+
+```bash
+# Clean up build artifacts
+make clean
+```
+
+### View All Available Commands
+
+```bash
+# Show help information, view all available commands
+make help
+```
+
+### Code Quality
+
+```bash
+# Format Go code
+make format
+
+# Verify code formatting
+make verify
+
+# Check license headers
+make license-check
+
+# Format license headers
+make license-format
+```
 
 Steps to install agent:
 ```bash

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import (
 const (
 	LogFileOutput = "file"
 	LogStdOutput  = "stdout"
-	//Version       = "1.13.2"
+	// Version       = "1.13.2"
 
 	ProgramName      = "CHAOS_AGENT"
 	BladeProgramName = "CHAOS_BLADE"
@@ -124,6 +124,9 @@ type Options struct {
 	LitmusChartUrl   string
 	CertUrl          string
 
+	// agent ip
+	LocalIp string
+
 	Flags *pflag.FlagSet
 }
 
@@ -146,9 +149,9 @@ type TransportConfig struct {
 	Environment string
 	// Endpoint is server address with port
 	Endpoint string
-	//Timeout is the maximum amount of time a client will wait for a connect to complete
+	// Timeout is the maximum amount of time a client will wait for a connect to complete
 	Timeout time.Duration
-	//Secure is setting the socket encrypted or not
+	// Secure is setting the socket encrypted or not
 	Secure bool
 }
 
@@ -159,7 +162,7 @@ func NewOptions() {
 
 	err := Opts.Parse()
 	if err != nil {
-		fmt.Printf(err.Error())
+		fmt.Print(err.Error())
 		os.Exit(1)
 	}
 
@@ -167,8 +170,8 @@ func NewOptions() {
 		Opts.Usage()
 		os.Exit(0)
 	}
-
 }
+
 func (o *Options) AddFlags() {
 	o.Flags = pflag.NewFlagSet("", pflag.ExitOnError)
 	o.Flags.Usage = func() {
@@ -211,6 +214,8 @@ func (o *Options) AddFlags() {
 
 	o.Flags.StringVar(&o.Port, "port", "19527", "the agent server port")
 
+	o.Flags.StringVar(&o.LocalIp, "localIp", "", "specify the agent IP address (useful when host has multiple IPs)")
+
 	o.Flags.BoolVarP(&o.Help, "help", "h", false, "Print Help text")
 }
 
@@ -221,10 +226,21 @@ func (o *Options) SetOthersByFlags() {
 	o.IsVpc = false
 	o.VpcId = o.License
 	o.Uid = ""
-	o.Ip = o.GetPrivateIp()
+	// 如果用户指定了 LocalIp，优先使用；否则自动获取
+	if o.LocalIp != "" {
+		// 验证指定的IP格式
+		if !o.isValidIP(o.LocalIp) {
+			logrus.Fatalf("Invalid IP address specified: %s. Please provide a valid IPv4 address.", o.LocalIp)
+		}
+		o.Ip = o.LocalIp
+		logrus.Infof("Using specified agent IP: %s (priority: highest)", o.Ip)
+	} else {
+		o.Ip = o.GetPrivateIp()
+		logrus.Debugf("Using auto-detected agent IP: %s", o.Ip)
+	}
 	o.HostName = o.GetHostName()
 	o.InstanceId = o.GetHostName()
-	o.Version = "1.0.3"
+	o.Version = "1.1.0"
 	o.InitApplicationInfo(o.ApplicationInstance, o.ApplicationGroup)
 
 	var err error
@@ -254,12 +270,12 @@ func (o *Options) InitApplicationInfo(appInstance string, appGroup string) {
 	if err := tools.RecordApplicationToFile(appInstance, appGroup, true); err != nil {
 		logrus.WithError(err).Warningln("record application info to local file failed")
 	}
-
 }
 
 func (o *Options) SetUid(uid string) {
 	o.Uid = uid
 }
+
 func (o *Options) SetCid(cid string) {
 	o.Cid = cid
 }
@@ -299,6 +315,7 @@ func (o *Options) IsHostMode() bool {
 func (o *Options) GetPid() string {
 	return strconv.Itoa(os.Getpid())
 }
+
 func (o *Options) GetPrivateIp() string {
 	ifs, err := net.Interfaces()
 	if err != nil {
@@ -345,4 +362,14 @@ func (o *Options) GetHostName() string {
 		return ""
 	}
 	return name
+}
+
+// isValidIP 验证IP地址格式是否有效
+func (o *Options) isValidIP(ip string) bool {
+	parsedIP := net.ParseIP(ip)
+	if parsedIP == nil {
+		return false
+	}
+	// 只接受IPv4地址
+	return parsedIP.To4() != nil
 }

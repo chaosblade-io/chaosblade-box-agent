@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2020 Alibaba Group Holding Ltd.
+ * Copyright 2025 The ChaosBlade Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ type DeploymentInfo struct {
 }
 
 type DeploymentCollector struct {
-	K8sBaseCollector
+	*K8sBaseCollector
 	opts metav1.ListOptions
 }
 
@@ -64,7 +64,6 @@ func NewDeploymentCollector(trans *transport.TransportClient, k8sChannel *kubern
 }
 
 func (collector *DeploymentCollector) Report() {
-
 	if collector.indexer == nil {
 		// 需要构建reflector
 		if collector.k8sChannel.ClientSet == nil {
@@ -89,7 +88,7 @@ func (collector *DeploymentCollector) getDeploymentInfo() ([]*DeploymentInfo, er
 	list := collector.indexer.List()
 	logrus.Debugf("[DEPLOYMENT REPORT] get deployments from lister, size: %d", len(list))
 	// deployments
-	var deployments = make([]*DeploymentInfo, 0)
+	deployments := make([]*DeploymentInfo, 0)
 	for _, dm := range list {
 		d := dm.(*v1.Deployment)
 		deploymentInfo := &DeploymentInfo{
@@ -153,7 +152,7 @@ func (collector *DeploymentCollector) handleDeploymentIncrement(deploymentInfo *
 
 func (collector *DeploymentCollector) reportNotExistResource() {
 	// old deployments
-	var deployments = make([]*DeploymentInfo, 0)
+	deployments := make([]*DeploymentInfo, 0)
 	collector.IdentifierLock.Lock()
 	deployIdentifiers := collector.identifiers
 	logrus.Debugf("[DEPLOYMENT REPORT] deployIdentifiers len: %d", len(deployIdentifiers))
