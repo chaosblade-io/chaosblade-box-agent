@@ -82,7 +82,7 @@ var Errors = map[int32]string{
 }
 
 func ReturnFail(errCode int32, args ...interface{}) *Response {
-	return &Response{Code: errCode, Success: false, Error: fmt.Sprintf(Errors[errCode], args)}
+	return &Response{Code: errCode, Success: false, Error: fmt.Sprintf(Errors[errCode], args...)}
 }
 
 func ReturnSuccess() *Response {
