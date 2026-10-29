@@ -87,7 +87,7 @@ func (request *Request) GetBody() map[string]string {
 	for k, v := range request.Params {
 		body[k] = v
 	}
-	
+
 	return body
 }
 
