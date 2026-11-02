@@ -66,7 +66,7 @@ func (handler *ServerRequestHandler) Handle(request string) (string, error) {
 		decodeDuration := time.Since(decodeStartTime)
 		logrus.Infof("[ServerRequestHandler] Request decode completed, duration: %v, time since handle start: %v", decodeDuration, time.Since(handleStartTime))
 
-		//拦截器先拦截，允许之后再执行
+		// 拦截器先拦截，允许之后再执行
 		if response, allow = handler.Interceptor.Handle(req); allow {
 			handlerStartTime := time.Now()
 			logrus.Infof("[ServerRequestHandler] Calling Handler.Handle() at %v, time since handle start: %v", handlerStartTime, time.Since(handleStartTime))

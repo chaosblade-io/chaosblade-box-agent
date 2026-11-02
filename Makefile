@@ -13,7 +13,7 @@
 # limitations under the License.
 
 .PHONY: build clean
-AGENT_VERSION ?= 1.1.0
+AGENT_VERSION ?= 1.1.1
 BLADE_VERSION ?= 1.8.0
 export AGENT_VERSION
 export BLADE_VERSION
@@ -51,11 +51,11 @@ GO_ENV=CGO_ENABLED=1
 GO_MODULE=GO111MODULE=on
 #GO_PROXY=GOPROXY=https://mirrors.aliyun.com/goproxy/
 GO=env $(GO_ENV) $(GO_MODULE) go
-#GO_X_FLAGS=-X ${VERSION_PKG}.AgentVersion=$(AGENT_VERSION) -X '${VERSION_PKG}.Env=`uname -mv`' -X '${VERSION_PKG}.BuildTime=`date`'
-GO_FLAGS=-ldflags="-s -w"
+GO_X_FLAGS=-X ${VERSION_PKG}.AgentVersion=$(AGENT_VERSION)
+GO_FLAGS=-ldflags="-s -w $(GO_X_FLAGS)"
 
 ifeq ($(GOOS), linux)
-	GO_FLAGS=-ldflags="-linkmode external -extldflags -static -s -w"
+	GO_FLAGS=-ldflags="-linkmode external -extldflags -static -s -w $(GO_X_FLAGS)"
 endif
 
 build: build_binary

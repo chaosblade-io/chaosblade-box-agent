@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/chaosblade-io/chaos-agent/pkg/tools"
+	"github.com/chaosblade-io/chaos-agent/version"
 )
 
 const (
@@ -240,7 +241,7 @@ func (o *Options) SetOthersByFlags() {
 	}
 	o.HostName = o.GetHostName()
 	o.InstanceId = o.GetHostName()
-	o.Version = "1.1.0"
+	o.Version = version.AgentVersion
 	o.InitApplicationInfo(o.ApplicationInstance, o.ApplicationGroup)
 
 	var err error
