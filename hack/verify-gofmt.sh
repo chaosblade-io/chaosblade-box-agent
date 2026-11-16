@@ -19,7 +19,10 @@ set -o nounset
 set -o pipefail
 
 source "$(dirname "$0")/init.sh"
-go install mvdan.cc/gofumpt@latest
+# Pinned on purpose: this runs on every pull_request via `make verify`,
+# so CI must not download and execute a floating "latest" tool. Bump it
+# deliberately, then re-run ./hack/update-gofmt.sh and ./hack/update-imports.sh.
+go install mvdan.cc/gofumpt@v0.12.0
 
 # gofmt exits with non-zero exit code if it finds a problem unrelated to
 # formatting (e.g., a file does not parse correctly). Without "|| true" this

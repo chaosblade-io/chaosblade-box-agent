@@ -34,6 +34,11 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+# Least-privilege default. Jobs that publish declare their own write scope
+# below, which overrides this.
+permissions:
+  contents: read
+
 jobs:
   build-and-publish:
     name: Build - ${{ matrix.arch }}
@@ -66,7 +71,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
       
@@ -84,7 +89,7 @@ jobs:
           echo "  Repository: ${{ github.repository }}"
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
         with:
           go-version: '1.25'
           cache: true
@@ -121,10 +126,10 @@ jobs:
           echo "Final version: $VERSION"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -137,7 +142,7 @@ jobs:
           echo "GOPATH=$HOME/go" >> $GITHUB_ENV
 
       - name: Install Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
         with:
           version: '3.12.0'
 
@@ -179,7 +184,7 @@ jobs:
 
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
@@ -230,14 +235,14 @@ jobs:
           fi
 
       - name: Upload package artifact for ${{ matrix.arch }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: package-${{ matrix.arch }}
           path: build/chaosagent-${{ env.VERSION }}-linux_${{ matrix.arch }}.tar.gz
           retention-days: 30
 
       - name: Upload helm chart artifact for ${{ matrix.arch }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: helm-chart-${{ matrix.arch }}
           path: build/helm3/**/*.tgz
@@ -253,7 +258,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
@@ -304,7 +309,7 @@ jobs:
           echo "Draft release: $DRAFT"
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: artifacts
 
@@ -378,7 +383,7 @@ jobs:
           cd ..
 
       - name: Setup OSSUTIL environment
-        uses: yizhoumo/setup-ossutil@v1.1.3
+        uses: yizhoumo/setup-ossutil@121c208740cd4b110f3adac409be66c17f5f948b # v1.1.3
         env:
           BINARY_TAG: ${{ env.VERSION }}
         with:
@@ -514,7 +519,7 @@ jobs:
           cat release-assets/RELEASE_NOTES.md
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
         with:
           name: v${{ env.VERSION }}
           draft: ${{ env.DRAFT }}
