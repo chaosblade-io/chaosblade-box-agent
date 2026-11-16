@@ -1,0 +1,78 @@
+# Copyright 2025 The ChaosBlade Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: 2
+updates:
+  # Keeps the commit-SHA pinned GitHub Actions up to date. Pinning by hash
+  # without an update tool would otherwise freeze the workflow dependencies.
+  #
+  # Major bumps are excluded deliberately, for two reasons:
+  #
+  #   1. 12 of the 15 pinned references live in release.yml, which only runs on
+  #      `push: tags: v*` and `workflow_dispatch`. A PR touching that file gets
+  #      no CI coverage at all, so a breaking major would pass every check and
+  #      only fail at the next tagged release.
+  #   2. github/codeql-action/init and github/codeql-action/analyze are tracked
+  #      as separate dependencies, so a major bump can move one and leave the
+  #      other behind. They must stay on the same commit.
+  #
+  # Minor and patch updates still flow through, which is enough to keep the
+  # pinned SHAs from rotting.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Go modules. This ecosystem is worth enabling here, and the reason is the
+  # one thing that makes it different from release.yml: ci.yml runs on
+  # pull_request and actually executes `go mod verify`, `go test -v ./...`,
+  # `go test -race ./...`, `go vet ./...` and `make verify`. A proposed bump is
+  # therefore compiled, tested and race-tested before it can merge, so the
+  # proposal is not landing unverified.
+  #
+  # Majors are still excluded: a Go module major bump (v1 -> v2) requires
+  # rewriting the import path to `.../v2`, which Dependabot does not do, so
+  # those PRs cannot compile. They need a deliberate manual pass.
+  #
+  # Note for maintainers: `scorecard --local` currently reports 101 known
+  # vulnerabilities across the 177 requires in go.mod (23 direct, 154 indirect).
+  # Minor and patch bumps will chip away at them; the ones that need a major
+  # bump will not appear here and have to be handled by hand.
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # No "docker" ecosystem, on purpose.
+  #
+  # The four Dockerfiles under build/ are only consumed by release.yml, which is
+  # tag-only -- so a base-image bump would merge without anything ever building
+  # it, and would only surface in a published release artifact.
+  #
+  # Three of the four FROM lines would not yield a useful proposal anyway:
+  # `alpine:3.22` is a mutable tag that already self-updates within 3.22.x, and
+  # `multiarch/alpine:arm64-edge` and
+  # `multiarch/ubuntu-debootstrap:arm64-bionic` are not semver-parseable.
+  #
+  # The fourth, `golang:1.25.5` in build/binary_musl/Dockerfile, is coupled to
+  # `go 1.25` in go.mod and to `go-version: '1.25'` in ci.yml. Those three have
+  # to move together; a bot that can only see the Dockerfile would desync them.

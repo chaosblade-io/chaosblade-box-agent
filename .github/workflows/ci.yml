@@ -20,6 +20,10 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# Least-privilege default for every job in this workflow.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test and Build
@@ -32,10 +36,10 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
         with:
           go-version: ${{ matrix.go-version }}
           cache: true
@@ -47,7 +51,7 @@ jobs:
         run: go mod download
 
       - name: Check License Header
-        uses: korandoru/hawkeye@v6
+        uses: korandoru/hawkeye@7ffde2c5fd29f3c486e4a6510436dca54f386e2a # v6
 
       - name: Run tests
         run: go test -v ./...
@@ -63,3 +67,31 @@ jobs:
 
       - name: Run code style and import order verification
         run: make verify
+
+  # Static check name for branch protection. The test job's own name is
+  # matrix-derived ("Test and Build (ubuntu-latest, 1.25)"), so it changes
+  # whenever the Go version or the runner list changes and would silently stop
+  # matching the required-status-check string. This job's name never moves.
+  ci-gate:
+    name: CI Gate
+    needs: [test]
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      TEST_RESULT: ${{ needs.test.result }}
+    steps:
+      - name: Require the test and build job to pass
+        run: |
+          echo "test=$TEST_RESULT"
+          fail=0
+          if [ "$TEST_RESULT" != "success" ]; then
+            fail=1
+            if [ "$TEST_RESULT" = "cancelled" ]; then
+              echo "::error::test was cancelled"
+            elif [ "$TEST_RESULT" = "skipped" ]; then
+              echo "::error::test was skipped (no path filters exist; expected to always run)"
+            else
+              echo "::error::test did not succeed (result=$TEST_RESULT)"
+            fi
+          fi
+          exit $fail
