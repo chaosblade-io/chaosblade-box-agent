@@ -25,7 +25,7 @@ require (
 	github.com/gosuri/uitable v0.0.4
 	github.com/litmuschaos/chaos-operator v0.0.0-20230420075054-3a5f576c5b22
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/opencontainers/image-spec v1.1.0
+	github.com/opencontainers/image-spec v1.1.1
 	github.com/openebs/maya v1.12.1
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
 	github.com/pkg/errors v0.9.1
