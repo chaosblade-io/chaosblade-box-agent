@@ -82,6 +82,8 @@ func (collector *K8sBaseCollector) ResourceName() string {
 
 // getServiceUidByName returns the service uid
 func (collector *K8sBaseCollector) getServiceUidByName(serviceName string) string {
+	collector.IdentifierLock.Lock()
+	defer collector.IdentifierLock.Unlock()
 	for k, v := range collector.identifiers {
 		if v.name == serviceName {
 			return k
@@ -138,12 +140,15 @@ func (collector *K8sBaseCollector) reportK8sMetric(namespace string, isExists bo
 					logrus.Warningf("kubernetes %s response is not map[string]", collector.ReportHandler)
 					return
 				}
+				// 修复并发问题：先收集需要更新的键，然后在锁内批量更新
+				collector.IdentifierLock.Lock()
 				for key, value := range vnCids {
 					// add cid to cache
 					if vi, ok := collector.identifiers[key]; ok {
 						vi.Cid = value.(string)
 					}
 				}
+				collector.IdentifierLock.Unlock()
 			}
 			podsCids := v[kubernetes.PodResource]
 			if podsCids != nil {
@@ -153,20 +158,26 @@ func (collector *K8sBaseCollector) reportK8sMetric(namespace string, isExists bo
 					logrus.Warningf("kubernetes %s response is not map[string]", collector.ReportHandler)
 					return
 				}
+				// 修复并发问题：先收集需要更新的键，然后在锁内批量更新
+				collector.IdentifierLock.Lock()
 				for key, value := range pCids {
 					// add cid to cache
 					if vi, ok := collector.secondIdentifiers[key]; ok {
 						vi.Cid = value.(string)
 					}
 				}
+				collector.IdentifierLock.Unlock()
 			}
 		} else {
+			// 修复并发问题：在锁内遍历和更新，避免遍历过程中 map 被修改
+			collector.IdentifierLock.Lock()
 			for key, value := range v {
 				// add cid to cache
 				if vi, ok := collector.identifiers[key]; ok {
 					vi.Cid = value.(string)
 				}
 			}
+			collector.IdentifierLock.Unlock()
 		}
 		logrus.Infof("Report kubernetes resources success, %s, ns: %s, size: %d", collector.ReportHandler, namespace, size)
 	} else {
